@@ -13,3 +13,11 @@
 :xmp a rdf:Property ;
     rdfs:label "XMP"@en ;
     rdfs:comment "Extensible Metadata Platform"@en .
+
+:pdf a rdf:Property ;
+    rdfs:label "PDF"@en ;
+    rdfs:comment "PDF metadata"@en .
+
+:photoshop a rdf:Property ;
+    rdfs:label "Photoshop"@en ;
+    rdfs:comment "Photoshop metadata"@en .

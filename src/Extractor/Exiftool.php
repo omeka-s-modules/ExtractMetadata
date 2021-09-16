@@ -43,6 +43,12 @@ class Exiftool implements ExtractorInterface
             case 'xmp':
                 $commandArgs[] = '-xmp:all';
                 break;
+            case 'pdf':
+                $commandArgs[] = '-pdf:all';
+                break;
+            case 'photoshop':
+                $commandArgs[] = '-photoshop:all';
+                break;
             default:
                 // This extractor does not support this metadata type.
                 return false;

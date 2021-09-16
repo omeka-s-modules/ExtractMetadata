@@ -1,6 +1,8 @@
 <?php
 namespace ExtractMetadata;
 
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Omeka\Entity;
 use Omeka\Module\AbstractModule;
 use Laminas\ServiceManager\ServiceLocatorInterface;
@@ -26,7 +28,22 @@ class Module extends AbstractModule
             'label' => 'XMP',
             'comment' => 'Extensible Metadata Platform',
         ],
+        'pdf' => [
+            'label' => 'PDF',
+            'comment' => 'PDF metadata',
+        ],
+        'photoshop' => [
+            'label' => 'Photoshop',
+            'comment' => 'Photoshop metadata',
+        ],
     ];
+
+    /**
+     * Metadata type properties cache
+     *
+     * @var array
+     */
+    protected $metadataTypeProperties;
 
     public function getConfig()
     {
@@ -35,7 +52,7 @@ class Module extends AbstractModule
 
     public function install(ServiceLocatorInterface $services)
     {
-        $this->importVocab();
+        $this->importVocab($services->get('Omeka\EntityManager'));
     }
 
     public function getConfigForm(PhpRenderer $view)
@@ -93,21 +110,22 @@ class Module extends AbstractModule
      * This will import the vocabulary and its properties if they are not
      * already imported. Use this method during upgrade if adding new
      * properties.
+     *
+     * @param EntityManager
      */
-    protected function importVocab()
+    protected function importVocab(EntityManager $entityManager)
     {
-        $em = $this->getServiceLocator()->get('Omeka\EntityManager');
-        $vocab = $em->getRepository(Entity\Vocabulary::class)
+        $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
             ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
         if (!$vocab) {
             $vocab = new Entity\Vocabulary;
             $vocab->setNamespaceUri(self::VOCAB_NAMESPACE_URI);
             $vocab->setPrefix(self::VOCAB_PREFIX);
             $vocab->setLabel(self::VOCAB_LABEL);
-            $em->persist($vocab);
+            $entityManager->persist($vocab);
         }
         foreach (self::VOCAB_PROPERTIES as $localName => $propertyData) {
-            $property = $em->getRepository(Entity\Property::class)
+            $property = $entityManager->getRepository(Entity\Property::class)
                 ->findOneBy([
                     'vocabulary' => $vocab,
                     'localName' => $localName,
@@ -118,10 +136,10 @@ class Module extends AbstractModule
                 $property->setLocalName($localName);
                 $property->setLabel($propertyData['label']);
                 $property->setComment($propertyData['comment']);
-                $em->persist($property);
+                $entityManager->persist($property);
             }
         }
-        $em->flush();
+        $entityManager->flush();
     }
 
     /**
@@ -134,21 +152,32 @@ class Module extends AbstractModule
      */
     public function setMetadataToMedia($filePath, Entity\Media $media, $mediaType = null)
     {
-        if (!@is_file($filePath)) {
-            // The file doesn't exist.
-            return;
-        }
         if (null === $mediaType) {
             // Fall back on the media type set to the media.
             $mediaType = $media->getMediaType();
         }
-        $config = $this->getServiceLocator()->get('Config');
-        if (!isset($config['extract_metadata_media_type_map'][$mediaType])) {
+        if (!@is_file($filePath)) {
+            // The file doesn't exist.
+            return;
+        }
+        $services = $this->getServiceLocator();
+        $config = $services->get('Config');
+        if (!isset($config['extract_metadata_media_types'][$mediaType])) {
             // The media type has no associated extractors.
             return;
         }
-        $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
-        foreach ($config['extract_metadata_media_type_map'][$mediaType] as $metadataType => $extractorName) {
+        $extractors = $services->get('ExtractMetadata\ExtractorManager');
+        $entityManager = $services->get('Omeka\EntityManager');
+        $metadataTypeProperties = $this->getMetadataTypeProperties();
+        $mediaValues = $media->getValues();
+        // Iterate each metadata type, extract the metadata using the extractor,
+        // and set the metadata as value(s) of the media.
+        foreach ($config['extract_metadata_media_types'][$mediaType] as $metadataType => $extractorName) {
+            if (!isset($this->metadataTypeProperties[$metadataType])) {
+                // This metadata type does not have a corresponding property.
+                return;
+            }
+            $metadataTypeProperty = $this->metadataTypeProperties[$metadataType];
             try {
                 $extractor = $extractors->get($extractorName);
             } catch (ServiceNotFoundException $e) {
@@ -166,7 +195,53 @@ class Module extends AbstractModule
                 continue;
             }
             $metadata = trim($metadata);
-            // @todo Save metadata to corresponding property
+            if ('' === $metadata) {
+                // The extractor returned an empty string.
+                continue;
+            }
+
+            $isPublic = true;
+            // Clear values.
+            $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $metadataTypeProperty));
+            foreach ($mediaValues->matching($criteria) as $mediaValueMetadataTypeProperty) {
+                $isPublic = $mediaValueMetadataTypeProperty->getIsPublic();
+                $mediaValues->removeElement($mediaValueMetadataTypeProperty);
+            }
+            // Use a property reference to avoid Doctrine's "A new entity was
+            // found" error during batch operations.
+            $metadataTypeProperty = $entityManager->getReference(Entity\Property::class, $metadataTypeProperty->getId());
+            // Create and add the value.
+            $value = new Entity\Value;
+            $value->setResource($media);
+            $value->setType('literal');
+            $value->setProperty($metadataTypeProperty);
+            $value->setValue($metadata);
+            $value->setIsPublic($isPublic);
+            $mediaValues->add($value);
         }
+    }
+
+    /**
+     * Get all properties of the "Extract Metadata" vocabulary.
+     *
+     * @return array An array of properties keyed by their local name
+     */
+    public function getMetadataTypeProperties()
+    {
+        if (isset($this->metadataTypeProperties)) {
+            return $this->metadataTypeProperties;
+        }
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
+            ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
+        if (!$vocab) {
+            // The "Extract Metadata" vocabulary was deleted. Re-import it.
+            return [];
+        }
+        $this->metadataTypeProperties = [];
+        foreach ($vocab->getProperties() as $property) {
+            $this->metadataTypeProperties[$property->getLocalName()] = $property;
+        }
+        return $this->metadataTypeProperties;
     }
 }
