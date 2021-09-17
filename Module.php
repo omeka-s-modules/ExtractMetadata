@@ -73,6 +73,14 @@ class Module extends AbstractModule
             'label' => 'QuickTime',
             'comment' => null,
         ],
+        'vorbis' => [
+            'label' => 'Vorbis',
+            'comment' => null,
+        ],
+        'asf' => [
+            'label' => 'ASF',
+            'comment' => 'Advanced Systems Format',
+        ],
     ];
 
     /**

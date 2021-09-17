@@ -76,6 +76,12 @@ class Exiftool implements ExtractorInterface
             case 'quicktime':
                 $commandArgs[] = '-quicktime:all';
                 break;
+            case 'vorbis':
+                $commandArgs[] = '-vorbis:all';
+                break;
+            case 'asf':
+                $commandArgs[] = '-asf:all';
+                break;
             default:
                 // This extractor does not support this metadata type.
                 return false;

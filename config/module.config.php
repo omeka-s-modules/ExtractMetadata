@@ -63,6 +63,14 @@ return [
             'iptc' => 'exiftool',
             'exif' => 'exiftool',
         ],
+        // PSD (image)
+        'application/vnd.adobe.photoshop' => [
+            'photoshop' => 'exiftool',
+            'iptc' => 'exiftool',
+            'xmp' => 'exiftool',
+            'iccprofile' => 'exiftool',
+            'exif' => 'exiftool',
+        ],
         // PDF (page layout)
         'application/pdf' => [
             'xmp' => 'exiftool',
@@ -76,10 +84,26 @@ return [
         'video/mp4' => [
             'quicktime' => 'exiftool',
         ],
+        // MPG (video)
+        'video/mpeg' => [
+            'mpeg' => 'exiftool',
+        ],
+        // WMV (video)
+        'video/x-ms-wmv' => [
+            'asf' => 'exiftool',
+        ],
         // MP3 (audio)
         'audio/mpeg' => [
             'mpeg' => 'exiftool',
             'id3' => 'exiftool',
+        ],
+        // OGG (audio)
+        'audio/ogg' => [
+            'vorbis' => 'exiftool',
+        ],
+        // WAV (audio)
+        'audio/wav' => [
+            'riff' => 'exiftool',
         ],
     ],
 ];
