@@ -73,6 +73,9 @@ class Exiftool implements ExtractorInterface
             case 'svg':
                 $commandArgs[] = '-svg:all';
                 break;
+            case 'quicktime':
+                $commandArgs[] = '-quicktime:all';
+                break;
             default:
                 // This extractor does not support this metadata type.
                 return false;
