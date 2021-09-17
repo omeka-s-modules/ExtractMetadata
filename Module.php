@@ -92,7 +92,10 @@ class Module extends AbstractModule
 
     public function getConfig()
     {
-        return include sprintf('%s/config/module.config.php', __DIR__);
+        return array_merge(
+            include sprintf('%s/config/module.config.php', __DIR__),
+            include sprintf('%s/config/media_types.config.php', __DIR__),
+        );
     }
 
     public function install(ServiceLocatorInterface $services)
