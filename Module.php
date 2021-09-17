@@ -20,9 +20,9 @@ class Module extends AbstractModule
             'label' => 'Exif',
             'comment' => 'Exchangeable Image File',
         ],
-        'iptciim' => [
+        'iptc' => [
             'label' => 'IPTC IIM',
-            'comment' => 'IPTC Information Interchange Model',
+            'comment' => 'International Press Telecommunications Council Information Interchange Model',
         ],
         'xmp' => [
             'label' => 'XMP',
@@ -30,11 +30,47 @@ class Module extends AbstractModule
         ],
         'pdf' => [
             'label' => 'PDF',
-            'comment' => 'PDF metadata',
+            'comment' => 'Portable Document Format',
         ],
         'photoshop' => [
-            'label' => 'Photoshop',
-            'comment' => 'Photoshop metadata',
+            'label' => 'Photoshop IRB',
+            'comment' => null,
+        ],
+        'gif' => [
+            'label' => 'GIF',
+            'comment' => 'Graphics Interchange Format',
+        ],
+        'iccprofile' => [
+            'label' => 'ICC Profile',
+            'comment' => 'International Color Consortium profile',
+        ],
+        'png' => [
+            'label' => 'PNG',
+            'comment' => 'Portable Network Graphics',
+        ],
+        'app14' => [
+            'label' => 'APP14',
+            'comment' => null,
+        ],
+        'riff' => [
+            'label' => 'RIFF',
+            'comment' => 'Resource Interchange File Format',
+        ],
+        'mpeg' => [
+            'label' => 'MPEG',
+            'comment' => 'Moving Picture Experts Group',
+        ],
+        'id3' => [
+            'label' => 'ID3',
+            'comment' => null,
+        ],
+        'svg' => [
+            'label' => 'SVG',
+            'comment' => 'Scalable Vector Graphics',
+        ],
+        'quicktime' => [
+            'label' => 'QuickTime',
+            'comment' => null,
         ],
     ];
 

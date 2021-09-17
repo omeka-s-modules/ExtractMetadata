@@ -37,7 +37,7 @@ class Exiftool implements ExtractorInterface
             case 'exif':
                 $commandArgs[] = '-exif:all';
                 break;
-            case 'iptciim':
+            case 'iptc':
                 $commandArgs[] = '-iptc:all';
                 break;
             case 'xmp':
@@ -48,6 +48,30 @@ class Exiftool implements ExtractorInterface
                 break;
             case 'photoshop':
                 $commandArgs[] = '-photoshop:all';
+                break;
+            case 'gif':
+                $commandArgs[] = '-gif:all';
+                break;
+            case 'iccprofile':
+                $commandArgs[] = '-icc_profile:all';
+                break;
+            case 'png':
+                $commandArgs[] = '-png:all';
+                break;
+            case 'app14':
+                $commandArgs[] = '-app14:all';
+                break;
+            case 'riff':
+                $commandArgs[] = '-riff:all';
+                break;
+            case 'mpeg':
+                $commandArgs[] = '-mpeg:all';
+                break;
+            case 'id3':
+                $commandArgs[] = '-id3:all';
+                break;
+            case 'svg':
+                $commandArgs[] = '-svg:all';
                 break;
             default:
                 // This extractor does not support this metadata type.

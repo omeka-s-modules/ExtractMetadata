@@ -29,29 +29,57 @@ return [
      * a registered extractor.
      */
     'extract_metadata_media_types' => [
+        // JPEG (image)
         'image/jpeg' => [
             'exif' => 'exiftool',
-            'iptciim' => 'exiftool',
-            'xmp' => 'exiftool',
+            'iccprofile' => 'exiftool',
             'photoshop' => 'exiftool',
+            'iptc' => 'exiftool',
+            'xmp' => 'exiftool',
+            'app14' => 'exiftool',
         ],
+        // PNG (image)
+        'image/png' => [
+            'xmp' => 'exiftool',
+            'png' => 'exiftool',
+            'iptc' => 'exiftool',
+            'exif' => 'exiftool',
+        ],
+        // GIF (image)
+        'image/gif' => [
+            'xmp' => 'exiftool',
+            'gif' => 'exiftool',
+            'iptc' => 'exiftool',
+        ],
+        // SVG (image)
+        'image/svg+xml' => [
+            'svg' => 'exiftool',
+            'iptc' => 'exiftool',
+        ],
+        // TIFF (image)
         'image/tiff' => [
             'exif' => 'exiftool',
-            'iptciim' => 'exiftool',
-            'xmp' => 'exiftool',
-            'photoshop' => 'exiftool',
-        ],
-        'image/png' => [
+            'iccprofile' => 'exiftool',
+            'iptc' => 'exiftool',
             'exif' => 'exiftool',
-            'iptciim' => 'exiftool',
-            'xmp' => 'exiftool',
-            'photoshop' => 'exiftool',
         ],
+        // PDF (page layout)
         'application/pdf' => [
-            'exif' => 'exiftool',
-            'iptciim' => 'exiftool',
             'xmp' => 'exiftool',
             'pdf' => 'exiftool',
+        ],
+        // AVI (video)
+        'video/x-msvideo' => [
+            'riff' => 'exiftool',
+        ],
+        // MP4 (video)
+        'video/mp4' => [
+            'quicktime' => 'exiftool',
+        ],
+        // MP3 (audio)
+        'audio/mpeg' => [
+            'mpeg' => 'exiftool',
+            'id3' => 'exiftool',
         ],
     ],
 ];
