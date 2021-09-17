@@ -4,6 +4,7 @@ namespace ExtractMetadata;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Omeka\Entity;
+use Omeka\File\Store\Local;
 use Omeka\Module\AbstractModule;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
@@ -138,6 +139,116 @@ class Module extends AbstractModule
                 );
             }
         );
+        /**
+         * After hydrating a media, perform the requested extract_metadata_action.
+         *
+         * There are two actions this method can perform:
+         *
+         * - refresh: (re)extracts metadata from files
+         * - clear: clears all extracted metadata media
+         */
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\MediaAdapter',
+            'api.hydrate.post',
+            function (Event $event) {
+                $media = $event->getParam('entity');
+                $data = $event->getParam('request')->getContent();
+                $action = $data['extract_metadata_action'] ?? 'default';
+                $store = $this->getServiceLocator()->get('Omeka\File\Store');
+                // Files must be stored locally to refresh extracted metadata.
+                if (('refresh' === $action) && ($store instanceof Local)) {
+                    $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
+                    $this->setMetadataToMedia($filePath, $media, $media->getMediaType());
+                } elseif ('clear' === $action) {
+                    $mediaValues = $media->getValues();
+                    foreach ($this->getMetadataTypeProperties() as $metadataTypeProperty) {
+                        $criteria = Criteria::create()
+                            ->where(Criteria::expr()->eq('property', $metadataTypeProperty))
+                            ->andWhere(Criteria::expr()->eq('type', 'literal'));
+                        foreach ($mediaValues->matching($criteria) as $mediaValue) {
+                            $mediaValues->removeElement($mediaValue);
+                        }
+                    }
+                }
+            }
+        );
+        /*
+         * Add the ExtractMetadata control to the media batch update form.
+         */
+        $sharedEventManager->attach(
+            'Omeka\Form\ResourceBatchUpdateForm',
+            'form.add_elements',
+            function (Event $event) {
+                $form = $event->getTarget();
+                $resourceType = $form->getOption('resource_type');
+                if ('media' !== $resourceType) {
+                    // This is not a media batch update form.
+                    return;
+                }
+                $valueOptions = [
+                    'clear' => 'Clear metadata', // @translate
+                    '' => '[No action]', // @translate
+                ];
+                $store = $this->getServiceLocator()->get('Omeka\File\Store');
+                if ($store instanceof Local) {
+                    // Files must be stored locally to refresh extracted metadata.
+                    $valueOptions = ['refresh' => 'Refresh metadata'] + $valueOptions; // @translate
+                }
+                $form->add([
+                    'name' => 'extract_metadata_action',
+                    'type' => 'Laminas\Form\Element\Radio',
+                    'options' => [
+                        'label' => 'Extract metadata', // @translate
+                        'value_options' => $valueOptions,
+                    ],
+                    'attributes' => [
+                        'value' => '',
+                        'data-collection-action' => 'replace',
+                    ],
+                ]);
+            }
+        );
+        /*
+         * Don't require the ExtractMetadata control in the media batch update
+         * form.
+         */
+        $sharedEventManager->attach(
+            'Omeka\Form\ResourceBatchUpdateForm',
+            'form.add_input_filters',
+            function (Event $event) {
+                $form = $event->getTarget();
+                $resourceType = $form->getOption('resource_type');
+                if ('media' !== $resourceType) {
+                    // This is not a media batch update form.
+                    return;
+                }
+                $inputFilter = $event->getParam('inputFilter');
+                $inputFilter->add([
+                    'name' => 'extract_metadata_action',
+                    'required' => false,
+                ]);
+            }
+        );
+        /*
+         * When preprocessing the batch update data, authorize the "extract_
+         * metadata_action" key. This will signal the process to refresh or
+         * clear the metadata while updating each media in the batch.
+         */
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\MediaAdapter',
+            'api.preprocess_batch_update',
+            function (Event $event) {
+                $adapter = $event->getTarget();
+                $data = $event->getParam('data');
+                $rawData = $event->getParam('request')->getContent();
+                if (isset($rawData['extract_metadata_action'])
+                    && in_array($rawData['extract_metadata_action'], ['refresh', 'clear'])
+                ) {
+                    $data['extract_metadata_action'] = $rawData['extract_metadata_action'];
+                }
+                $event->setParam('data', $data);
+            }
+        );
     }
 
     /**
@@ -154,6 +265,7 @@ class Module extends AbstractModule
         $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
             ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
         if (!$vocab) {
+            // The vocabulary doesn't already exist. Create it.
             $vocab = new Entity\Vocabulary;
             $vocab->setNamespaceUri(self::VOCAB_NAMESPACE_URI);
             $vocab->setPrefix(self::VOCAB_PREFIX);
@@ -167,6 +279,7 @@ class Module extends AbstractModule
                     'localName' => $localName,
                 ]);
             if (!$property) {
+                // The property doesn't already exist. Create it.
                 $property = new Entity\Property;
                 $property->setVocabulary($vocab);
                 $property->setLocalName($localName);
@@ -186,12 +299,8 @@ class Module extends AbstractModule
      * @param string $mediaType
      * @return null|false
      */
-    public function setMetadataToMedia($filePath, Entity\Media $media, $mediaType = null)
+    public function setMetadataToMedia($filePath, Entity\Media $media, $mediaType)
     {
-        if (null === $mediaType) {
-            // Fall back on the media type set to the media.
-            $mediaType = $media->getMediaType();
-        }
         if (!@is_file($filePath)) {
             // The file doesn't exist.
             return;
@@ -239,9 +348,9 @@ class Module extends AbstractModule
             $isPublic = true;
             // Clear values.
             $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $metadataTypeProperty));
-            foreach ($mediaValues->matching($criteria) as $mediaValueMetadataTypeProperty) {
-                $isPublic = $mediaValueMetadataTypeProperty->getIsPublic();
-                $mediaValues->removeElement($mediaValueMetadataTypeProperty);
+            foreach ($mediaValues->matching($criteria) as $mediaValue) {
+                $isPublic = $mediaValue->getIsPublic();
+                $mediaValues->removeElement($mediaValue);
             }
             // Use a property reference to avoid Doctrine's "A new entity was
             // found" error during batch operations.
