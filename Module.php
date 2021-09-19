@@ -152,34 +152,41 @@ class Module extends AbstractModule
         );
         /**
          * After hydrating a media, perform the requested extract_metadata_action.
-         *
-         * There are two actions this method can perform:
-         *
-         * - refresh: (re)extracts metadata from files
-         * - clear: clears all extracted metadata media
+         * This will only happen when updating the media.
          */
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\MediaAdapter',
             'api.hydrate.post',
             function (Event $event) {
+                $request = $event->getParam('request');
+                if ('update' !== $request->getOperation()) {
+                    // This is not an update operation.
+                    return;
+                }
                 $media = $event->getParam('entity');
-                $data = $event->getParam('request')->getContent();
+                $data = $request->getContent();
                 $action = $data['extract_metadata_action'] ?? 'default';
-                $store = $this->getServiceLocator()->get('Omeka\File\Store');
-                // Files must be stored locally to refresh extracted metadata.
-                if (('refresh' === $action) && ($store instanceof Local)) {
-                    $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
-                    $this->setMetadataToMedia($filePath, $media, $media->getMediaType());
-                } elseif ('clear' === $action) {
-                    $mediaValues = $media->getValues();
-                    foreach ($this->getMetadataTypeProperties() as $metadataTypeProperty) {
-                        $criteria = Criteria::create()
-                            ->where(Criteria::expr()->eq('property', $metadataTypeProperty))
-                            ->andWhere(Criteria::expr()->eq('type', 'literal'));
-                        foreach ($mediaValues->matching($criteria) as $mediaValue) {
-                            $mediaValues->removeElement($mediaValue);
-                        }
-                    }
+                $this->performActionOnMedia($media, $action);
+            }
+        );
+        /**
+         * After hydrating an item, perform the requested extract_metadata_action.
+         * This will only happen when updating the item.
+         */
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.hydrate.post',
+            function (Event $event) {
+                $request = $event->getParam('request');
+                if ('update' !== $request->getOperation()) {
+                    // This is not an update operation.
+                    return;
+                }
+                $item = $event->getParam('entity');
+                $data = $request->getContent();
+                $action = $data['extract_metadata_action'] ?? 'default';
+                foreach ($item->getMedia() as $media) {
+                    $this->performActionOnMedia($media, $action);
                 }
             }
         );
@@ -192,8 +199,8 @@ class Module extends AbstractModule
             function (Event $event) {
                 $form = $event->getTarget();
                 $resourceType = $form->getOption('resource_type');
-                if ('media' !== $resourceType) {
-                    // This is not a media batch update form.
+                if (!in_array($resourceType, ['media', 'item'])) {
+                    // This is not a media or item batch update form.
                     return;
                 }
                 $valueOptions = [
@@ -220,8 +227,7 @@ class Module extends AbstractModule
             }
         );
         /*
-         * Don't require the ExtractMetadata control in the media batch update
-         * form.
+         * Don't require the ExtractMetadata control in the batch update forms.
          */
         $sharedEventManager->attach(
             'Omeka\Form\ResourceBatchUpdateForm',
@@ -229,8 +235,8 @@ class Module extends AbstractModule
             function (Event $event) {
                 $form = $event->getTarget();
                 $resourceType = $form->getOption('resource_type');
-                if ('media' !== $resourceType) {
-                    // This is not a media batch update form.
+                if (!in_array($resourceType, ['media', 'item'])) {
+                    // This is not a media or item batch update form.
                     return;
                 }
                 $inputFilter = $event->getParam('inputFilter');
@@ -241,24 +247,30 @@ class Module extends AbstractModule
             }
         );
         /*
-         * When preprocessing the batch update data, authorize the "extract_
-         * metadata_action" key. This will signal the process to refresh or
-         * clear the metadata while updating each media in the batch.
+         * Authorize the "extract_metadata_action" key when preprocessing the
+         * batch update data. This will signal the process to refresh or clear
+         * the metadata while updating each resource in the batch.
          */
+        $preprocessBatchUpdate = function(Event $event) {
+            $adapter = $event->getTarget();
+            $data = $event->getParam('data');
+            $rawData = $event->getParam('request')->getContent();
+            if (isset($rawData['extract_metadata_action'])
+                && in_array($rawData['extract_metadata_action'], ['refresh', 'clear'])
+            ) {
+                $data['extract_metadata_action'] = $rawData['extract_metadata_action'];
+            }
+            $event->setParam('data', $data);
+        };
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\MediaAdapter',
             'api.preprocess_batch_update',
-            function (Event $event) {
-                $adapter = $event->getTarget();
-                $data = $event->getParam('data');
-                $rawData = $event->getParam('request')->getContent();
-                if (isset($rawData['extract_metadata_action'])
-                    && in_array($rawData['extract_metadata_action'], ['refresh', 'clear'])
-                ) {
-                    $data['extract_metadata_action'] = $rawData['extract_metadata_action'];
-                }
-                $event->setParam('data', $data);
-            }
+            $preprocessBatchUpdate
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.preprocess_batch_update',
+            $preprocessBatchUpdate
         );
     }
 
@@ -269,7 +281,7 @@ class Module extends AbstractModule
      * already imported. Use this method during upgrade if adding new
      * properties.
      *
-     * @param EntityManager
+     * @param EntityManager $entityManager
      */
     protected function importVocab(EntityManager $entityManager)
     {
@@ -306,7 +318,7 @@ class Module extends AbstractModule
      * Set extracted metadata to a media.
      *
      * @param string $filePath
-     * @param Media $media
+     * @param Entity\Media $media
      * @param string $mediaType
      * @return null|false
      */
@@ -374,6 +386,36 @@ class Module extends AbstractModule
             $value->setValue($metadata);
             $value->setIsPublic($isPublic);
             $mediaValues->add($value);
+        }
+    }
+
+    /**
+     * Perform an extract metadata action on a media. There are two actions this
+     * method can perform:
+     *
+     * - refresh: (re)extracts metadata from files and sets them to the media
+     * - clear: clears all extracted metadata from the media
+     *
+     * @param Entity\Media $media
+     * @param string $action
+     */
+    public function performActionOnMedia(Entity\Media $media, $action)
+    {
+        $store = $this->getServiceLocator()->get('Omeka\File\Store');
+        // Files must be stored locally to refresh extracted metadata.
+        if (('refresh' === $action) && ($store instanceof Local)) {
+            $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
+            $this->setMetadataToMedia($filePath, $media, $media->getMediaType());
+        } elseif ('clear' === $action) {
+            $mediaValues = $media->getValues();
+            foreach ($this->getMetadataTypeProperties() as $metadataTypeProperty) {
+                $criteria = Criteria::create()
+                    ->where(Criteria::expr()->eq('property', $metadataTypeProperty))
+                    ->andWhere(Criteria::expr()->eq('type', 'literal'));
+                foreach ($mediaValues->matching($criteria) as $mediaValue) {
+                    $mediaValues->removeElement($mediaValue);
+                }
+            }
         }
     }
 
