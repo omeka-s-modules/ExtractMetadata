@@ -154,7 +154,7 @@ class Module extends AbstractModule
                 );
             }
         );
-        /**
+        /*
          * After hydrating a media, perform the requested extract_metadata_action.
          * This will only happen when updating the media.
          */
@@ -173,7 +173,7 @@ class Module extends AbstractModule
                 $this->performActionOnMedia($media, $action);
             }
         );
-        /**
+        /*
          * After hydrating an item, perform the requested extract_metadata_action.
          * This will only happen when updating the item.
          */
