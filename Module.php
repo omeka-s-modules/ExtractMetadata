@@ -16,6 +16,10 @@ class Module extends AbstractModule
     const VOCAB_NAMESPACE_URI = 'http://omeka.org/s/vocabs/o-module-extractmetadata#';
     const VOCAB_PREFIX = 'extractmetadata';
     const VOCAB_LABEL = 'Extract Metadata';
+    /**
+     * "Extract Metadata" vocabulary properties, keyed by local name. Every
+     * local name is also a metadata type.
+     */
     const VOCAB_PROPERTIES = [
         'exif' => [
             'label' => 'Exif',
@@ -279,7 +283,8 @@ class Module extends AbstractModule
      *
      * This will import the vocabulary and its properties if they are not
      * already imported. Use this method during upgrade if adding new
-     * properties.
+     * properties. Simply add the properties to self::VOCAB_PROPERTIES and call
+     * this method.
      *
      * @param EntityManager $entityManager
      */
@@ -433,7 +438,7 @@ class Module extends AbstractModule
         $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
             ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
         if (!$vocab) {
-            // The "Extract Metadata" vocabulary was deleted. Re-import it.
+            // The "Extract Metadata" vocabulary was deleted.
             return [];
         }
         $this->metadataTypeProperties = [];
