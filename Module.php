@@ -255,7 +255,7 @@ class Module extends AbstractModule
          * batch update data. This will signal the process to refresh or clear
          * the metadata while updating each resource in the batch.
          */
-        $preprocessBatchUpdate = function(Event $event) {
+        $preprocessBatchUpdate = function (Event $event) {
             $adapter = $event->getTarget();
             $data = $event->getParam('data');
             $rawData = $event->getParam('request')->getContent();
@@ -275,6 +275,68 @@ class Module extends AbstractModule
             'Omeka\Api\Adapter\ItemAdapter',
             'api.preprocess_batch_update',
             $preprocessBatchUpdate
+        );
+        /*
+         * Add an "Extract metadata" tab to the item and media edit pages.
+         */
+        $viewEditSectionNav = function (Event $event) {
+            $view = $event->getTarget();
+            $sectionNavs = $event->getParam('section_nav');
+            $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
+            $event->setParam('section_nav', $sectionNavs);
+        };
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.section_nav',
+            $viewEditSectionNav
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.edit.section_nav',
+            $viewEditSectionNav
+        );
+        /*
+         * Add an "Extract metadata" section to the item and media edit pages.
+         */
+        $viewEditFormAfter = function (Event $event) {
+            $view = $event->getTarget();
+            $store = $this->getServiceLocator()->get('Omeka\File\Store');
+            $refreshRadioButton = null;
+            if ($store instanceof Local) {
+                // Files must be stored locally to refresh extracted text.
+                $refreshRadioButton = sprintf(
+                    '<label><input type="radio" name="extract_metadata_action" value="refresh">%s</label>',
+                    $view->translate('Refresh metadata')
+                );
+            }
+            $html = sprintf('
+            <div id="extract-metadata" class="section">
+                <div class="field">
+                    <div class="field-meta">
+                        <label for="extract_metadata_action">%s</label>
+                    </div>
+                    <div class="inputs">
+                        %s
+                        <label><input type="radio" name="extract_metadata_action" value="clear">%s</label>
+                        <label><input type="radio" name="extract_metadata_action" value="" checked="checked">%s</label>
+                    </div>
+                </div>
+            </div>',
+            $view->translate('Extract metadata'),
+            $refreshRadioButton,
+            $view->translate('Clear metadata'),
+            $view->translate('[No action]'));
+            echo $html;
+        };
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.form.after',
+            $viewEditFormAfter
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.edit.form.after',
+            $viewEditFormAfter
         );
     }
 
