@@ -12,11 +12,11 @@ Once installed and active, this module has the following features:
 
 ## Supported file formats:
 
-- JPEG (image/jpeg)
+- JPG, JPEG (image/jpeg)
 - PNG (image/png)
 - GIF (image/gif)
 - SVG (image/svg+xml)
-- TIFF (image/tiff)
+- TIF, TIFF (image/tiff)
 - PSD (application/vnd.adobe.photoshop)
 - PDF (application/pdf)
 - DOC (application/msword)
@@ -26,9 +26,15 @@ Once installed and active, this module has the following features:
 - MP4 (video/mp4)
 - MPG (video/mpeg)
 - WMV (video/x-ms-wmv, video/x-ms-asf)
+- MOV (video/quicktime)
 - MP3 (audio/mpeg)
-- OGG (audio/ogg)
+- OGG, OPUS (audio/ogg)
 - WAV (audio/wav, audio/x-wav)
+- AIFF (audio/aiff, audio/x-aiff)
+- FLAC (audio/flac, audio/x-flac)
+- M4A (audio/m4a)
+- MP4 (audio/mp4)
+- ZIP (application/zip)
 - [More to be added]
 
 Note that some file extensions or media types may be disallowed in your global settings.
@@ -55,6 +61,10 @@ Note that some file extensions or media types may be disallowed in your global s
 - ZIP
 - XML
 - RTF
+- AIFF
+- FLAC
+- ZIP
+- EXE
 - [More to be added]
 
 ## Extractors:

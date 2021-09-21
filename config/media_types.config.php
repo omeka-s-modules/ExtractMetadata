@@ -8,7 +8,7 @@
  */
 return [
     'extract_metadata_media_types' => [
-        // JPEG (image)
+        // JPG, JPEG (image)
         'image/jpeg' => [
             'exif' => 'exiftool',
             'iccprofile' => 'exiftool',
@@ -35,7 +35,7 @@ return [
             'svg' => 'exiftool',
             'iptc' => 'exiftool',
         ],
-        // TIFF (image)
+        // TIF, TIFF (image)
         'image/tiff' => [
             'exif' => 'exiftool',
             'iccprofile' => 'exiftool',
@@ -92,12 +92,16 @@ return [
         'video/x-ms-asf' => [
             'asf' => 'exiftool',
         ],
+        // MOV (video)
+        'video/quicktime' => [
+            'quicktime' => 'exiftool',
+        ],
         // MP3 (audio)
         'audio/mpeg' => [
             'mpeg' => 'exiftool',
             'id3' => 'exiftool',
         ],
-        // OGG (audio)
+        // OGG, OPUS (audio)
         'audio/ogg' => [
             'vorbis' => 'exiftool',
         ],
@@ -107,6 +111,35 @@ return [
         ],
         'audio/x-wav' => [
             'riff' => 'exiftool',
+        ],
+        // AIFF (audio)
+        'audio/aiff' => [
+            'aiff' => 'exiftool',
+        ],
+        'audio/x-aiff' => [
+            'aiff' => 'exiftool',
+        ],
+        // FLAC (audio)
+        'audio/flac' => [
+            'flac' => 'exiftool',
+            'vorbis' => 'exiftool',
+        ],
+        'audio/x-flac' => [
+            'flac' => 'exiftool',
+            'vorbis' => 'exiftool',
+        ],
+        // M4A (audio)
+        'audio/m4a' => [
+            'quicktime' => 'exiftool',
+        ],
+        // MP4 (audio)
+        'audio/mp4' => [
+            'quicktime' => 'exiftool',
+        ],
+        // ZIP (compressed)
+        'application/zip' => [
+            'zip' => 'exiftool',
+            'exe' => 'exiftool',
         ],
     ],
 ];

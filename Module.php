@@ -101,6 +101,22 @@ class Module extends AbstractModule
             'label' => 'RTF',
             'comment' => null,
         ],
+        'aiff' => [
+            'label' => 'AIFF',
+            'comment' => null,
+        ],
+        'flac' => [
+            'label' => 'FLAC',
+            'comment' => null,
+        ],
+        'zip' => [
+            'label' => 'ZIP',
+            'comment' => null,
+        ],
+        'exe' => [
+            'label' => 'EXE',
+            'comment' => null,
+        ],
     ];
 
     /**
