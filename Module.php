@@ -130,7 +130,7 @@ class Module extends AbstractModule
     {
         return array_merge(
             include sprintf('%s/config/module.config.php', __DIR__),
-            include sprintf('%s/config/media_types.config.php', __DIR__),
+            include sprintf('%s/config/media_types.config.php', __DIR__)
         );
     }
 
