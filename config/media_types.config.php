@@ -55,6 +55,24 @@ return [
             'xmp' => 'exiftool',
             'pdf' => 'exiftool',
         ],
+        // DOC (text)
+        'application/msword' => [
+            'flashpix' => 'exiftool',
+        ],
+        // DOCX (text)
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => [
+            'zip' => 'exiftool',
+            'xmp' => 'exiftool',
+            'xml' => 'exiftool',
+        ],
+        // ODT (text)
+        'application/vnd.oasis.opendocument.text' => [
+            'xmp' => 'exiftool',
+        ],
+        // RTF (text)
+        'application/rtf' => [
+            'rtf' => 'exiftool',
+        ],
         // AVI (video)
         'video/x-msvideo' => [
             'riff' => 'exiftool',

@@ -85,6 +85,22 @@ class Module extends AbstractModule
             'label' => 'ASF',
             'comment' => 'Advanced Systems Format',
         ],
+        'flashpix' => [
+            'label' => 'FlashPix',
+            'comment' => null,
+        ],
+        'zip' => [
+            'label' => 'ZIP',
+            'comment' => null,
+        ],
+        'xml' => [
+            'label' => 'XML',
+            'comment' => null,
+        ],
+        'rtf' => [
+            'label' => 'RTF',
+            'comment' => null,
+        ],
     ];
 
     /**

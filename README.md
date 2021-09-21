@@ -19,6 +19,9 @@ Once installed and active, this module has the following features:
 - TIFF (image/tiff)
 - PSD (application/vnd.adobe.photoshop)
 - PDF (application/pdf)
+- DOC (application/msword)
+- DOCX (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+- RTF (application/rtf)
 - AVI (video/x-msvideo)
 - MP4 (video/mp4)
 - MPG (video/mpeg)
@@ -30,7 +33,7 @@ Once installed and active, this module has the following features:
 
 Note that some file extensions or media types may be disallowed in your global settings.
 
-## Supported metadata:
+## Supported metadata types:
 
 - [Exif](https://en.wikipedia.org/wiki/Exif)
 - [IPTC IIM](https://www.iptc.org/standards/iim/)
@@ -48,6 +51,10 @@ Note that some file extensions or media types may be disallowed in your global s
 - QuickTime
 - Vorbis
 - ASF
+- [FlashPix](https://en.wikipedia.org/wiki/FlashPix)
+- ZIP
+- XML
+- RTF
 - [More to be added]
 
 ## Extractors:

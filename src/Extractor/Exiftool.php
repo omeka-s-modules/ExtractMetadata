@@ -82,6 +82,18 @@ class Exiftool implements ExtractorInterface
             case 'asf':
                 $commandArgs[] = '-asf:all';
                 break;
+            case 'flashpix':
+                $commandArgs[] = '-flashpix:all';
+                break;
+            case 'zip':
+                $commandArgs[] = '-zip:all';
+                break;
+            case 'xml':
+                $commandArgs[] = '-xml:all';
+                break;
+            case 'rtf':
+                $commandArgs[] = '-rtf:all';
+                break;
             default:
                 // This extractor does not support this metadata type.
                 return false;
