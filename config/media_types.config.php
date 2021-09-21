@@ -89,7 +89,7 @@ return [
         'video/x-ms-wmv' => [
             'asf' => 'exiftool',
         ],
-        'video/x-ms-asf"' => [
+        'video/x-ms-asf' => [
             'asf' => 'exiftool',
         ],
         // MP3 (audio)

@@ -1,0 +1,45 @@
+<table class="tablesaw tablesaw-stack">
+    <thead>
+        <tr>
+            <th><?php echo $this->translate('Extractor'); ?></th>
+            <th><?php echo $this->translate('Available'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($extractors->getRegisteredNames() as $extractorName): ?>
+        <?php
+        $extractor = $extractors->get($extractorName);
+        $isAvailable = $extractor->isAvailable()
+            ? sprintf('<span style="color: green;">%s</span>', $this->translate('Yes'))
+            : sprintf('<span style="color: red;">%s</span>', $this->translate('No'));
+        ?>
+        <tr>
+            <td><?php echo $extractorName; ?></td>
+            <td><?php echo $isAvailable; ?></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<table class="tablesaw tablesaw-stack">
+    <thead>
+        <tr>
+            <th><?php echo $this->translate('Media type'); ?></th>
+            <th><?php echo $this->translate('Metadata type : Extractor'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($mediaTypes as $mediaType => $mediaTypeData): ?>
+        <tr>
+            <td><?php echo $mediaType; ?></td>
+            <td>
+                <ul>
+                <?php foreach ($mediaTypeData as $metadataType => $extractorName): ?>
+                    <li><?php echo sprintf('%s: %s', $metadataType, $extractorName); ?></li>
+                <?php endforeach; ?>
+                </ul>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>

@@ -125,31 +125,15 @@ class Module extends AbstractModule
 
     public function getConfigForm(PhpRenderer $view)
     {
-        $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
-        $html = '
-        <table class="tablesaw tablesaw-stack">
-            <thead>
-            <tr>
-                <th>' . $view->translate('Extractor') . '</th>
-                <th>' . $view->translate('Available') . '</th>
-            </tr>
-            </thead>
-            <tbody>';
-        foreach ($extractors->getRegisteredNames() as $extractorName) {
-            $extractor = $extractors->get($extractorName);
-            $isAvailable = $extractor->isAvailable()
-                ? sprintf('<span style="color: green;">%s</span>', $view->translate('Yes'))
-                : sprintf('<span style="color: red;">%s</span>', $view->translate('No'));
-            $html .= sprintf('
-            <tr>
-                <td>%s</td>
-                <td>%s</td>
-            </tr>', $extractorName, $isAvailable);
-        }
-        $html .= '
-            </tbody>
-        </table>';
-        return $html;
+        $services = $this->getServiceLocator();
+        $extractors = $services->get('ExtractMetadata\ExtractorManager');
+        $config = $services->get('Config');
+        $mediaTypes = $config['extract_metadata_media_types'];
+        ksort($mediaTypes);
+        return $view->partial('common/extract-metadata-config-form', [
+            'extractors' => $extractors,
+            'mediaTypes' => $mediaTypes,
+        ]);
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)

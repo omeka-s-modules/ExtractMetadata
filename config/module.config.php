@@ -12,6 +12,11 @@ return [
             ],
         ],
     ],
+    'view_manager' => [
+        'template_path_stack' => [
+            sprintf('%s/../view', __DIR__),
+        ],
+    ],
     'service_manager' => [
         'factories' => [
             'ExtractMetadata\ExtractorManager' => Service\Extractor\ManagerFactory::class,
