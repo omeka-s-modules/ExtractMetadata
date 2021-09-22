@@ -125,10 +125,6 @@ class Module extends AbstractModule
             'label' => 'OPUS',
             'comment' => null,
         ],
-        'flashpix' => [
-            'label' => 'FlashPix',
-            'comment' => null,
-        ],
         'flash' => [
             'label' => 'Flash',
             'comment' => null,

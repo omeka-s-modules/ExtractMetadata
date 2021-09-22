@@ -77,7 +77,6 @@ Note that some file extensions or media types may be disallowed in your global s
 - EXE
 - Theora
 - OPUS
-- FlashPix
 - Flash
 - [More to be added]
 

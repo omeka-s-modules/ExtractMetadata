@@ -112,9 +112,6 @@ class Exiftool implements ExtractorInterface
             case 'opus':
                 $commandArgs[] = '-opus:all';
                 break;
-            case 'flashpix':
-                $commandArgs[] = '-flashpix:all';
-                break;
             case 'flash':
                 $commandArgs[] = '-flash:all';
                 break;
