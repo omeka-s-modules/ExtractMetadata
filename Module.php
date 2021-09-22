@@ -117,6 +117,22 @@ class Module extends AbstractModule
             'label' => 'EXE',
             'comment' => null,
         ],
+        'theora' => [
+            'label' => 'Theora',
+            'comment' => null,
+        ],
+        'opus' => [
+            'label' => 'OPUS',
+            'comment' => null,
+        ],
+        'flashpix' => [
+            'label' => 'FlashPix',
+            'comment' => null,
+        ],
+        'flash' => [
+            'label' => 'Flash',
+            'comment' => null,
+        ],
     ];
 
     /**

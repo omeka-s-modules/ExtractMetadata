@@ -106,6 +106,18 @@ class Exiftool implements ExtractorInterface
             case 'exe':
                 $commandArgs[] = '-exe:all';
                 break;
+            case 'theora':
+                $commandArgs[] = '-theora:all';
+                break;
+            case 'opus':
+                $commandArgs[] = '-opus:all';
+                break;
+            case 'flashpix':
+                $commandArgs[] = '-flashpix:all';
+                break;
+            case 'flash':
+                $commandArgs[] = '-flash:all';
+                break;
             default:
                 // This extractor does not support this metadata type.
                 return false;

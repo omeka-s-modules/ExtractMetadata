@@ -8,7 +8,7 @@
  */
 return [
     'extract_metadata_media_types' => [
-        // JPG, JPEG (image)
+        // JPG, JPEG
         'image/jpeg' => [
             'exif' => 'exiftool',
             'iccprofile' => 'exiftool',
@@ -17,32 +17,32 @@ return [
             'xmp' => 'exiftool',
             'app14' => 'exiftool',
         ],
-        // PNG (image)
+        // PNG
         'image/png' => [
             'xmp' => 'exiftool',
             'png' => 'exiftool',
             'iptc' => 'exiftool',
             'exif' => 'exiftool',
         ],
-        // GIF (image)
+        // GIF
         'image/gif' => [
             'xmp' => 'exiftool',
             'gif' => 'exiftool',
             'iptc' => 'exiftool',
         ],
-        // SVG (image)
+        // SVG
         'image/svg+xml' => [
             'svg' => 'exiftool',
             'iptc' => 'exiftool',
         ],
-        // TIF, TIFF (image)
+        // TIF, TIFF
         'image/tiff' => [
             'exif' => 'exiftool',
             'iccprofile' => 'exiftool',
             'iptc' => 'exiftool',
             'exif' => 'exiftool',
         ],
-        // PSD (image)
+        // PSD
         'application/vnd.adobe.photoshop' => [
             'photoshop' => 'exiftool',
             'iptc' => 'exiftool',
@@ -50,76 +50,103 @@ return [
             'iccprofile' => 'exiftool',
             'exif' => 'exiftool',
         ],
-        // PDF (page layout)
+        // PDF
         'application/pdf' => [
             'xmp' => 'exiftool',
             'pdf' => 'exiftool',
         ],
-        // DOC (text)
+        // DOC
         'application/msword' => [
             'flashpix' => 'exiftool',
         ],
-        // DOCX (text)
+        // DOCX
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => [
             'zip' => 'exiftool',
             'xmp' => 'exiftool',
             'xml' => 'exiftool',
         ],
-        // ODT (text)
+        // ODT
         'application/vnd.oasis.opendocument.text' => [
             'xmp' => 'exiftool',
         ],
-        // RTF (text)
+        // ODS
+        'application/vnd.oasis.opendocument.spreadsheet' => [
+            'xmp' => 'exiftool',
+        ],
+        // ODP
+        'application/vnd.oasis.opendocument.presentation' => [
+            'xmp' => 'exiftool',
+        ],
+        // PPT
+        'application/vnd.ms-powerpoint' => [
+            'flashpix' => 'exiftool',
+        ],
+        // PPTX
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation' => [
+            'zip' => 'exiftool',
+            'xml' => 'exiftool',
+            'xmp' => 'exiftool',
+        ],
+        // RTF
         'application/rtf' => [
             'rtf' => 'exiftool',
         ],
-        // AVI (video)
+        // AVI
         'video/x-msvideo' => [
             'riff' => 'exiftool',
         ],
-        // MP4 (video)
+        // MP4
         'video/mp4' => [
             'quicktime' => 'exiftool',
         ],
-        // MPG (video)
+        // MPG, MPEG
         'video/mpeg' => [
             'mpeg' => 'exiftool',
         ],
-        // WMV (video)
+        // WMV
         'video/x-ms-wmv' => [
             'asf' => 'exiftool',
         ],
         'video/x-ms-asf' => [
             'asf' => 'exiftool',
         ],
-        // MOV (video)
+        // MOV
         'video/quicktime' => [
             'quicktime' => 'exiftool',
         ],
-        // MP3 (audio)
+        // OGV
+        'video/ogg' => [
+            'vorbis' => 'exiftool',
+            'theora' => 'exiftool',
+        ],
+        // SWF
+        'application/x-shockwave-flash' => [
+            'flash' => 'exiftool',
+        ],
+        // MP3
         'audio/mpeg' => [
             'mpeg' => 'exiftool',
             'id3' => 'exiftool',
         ],
-        // OGG, OPUS (audio)
+        // OGG, OGA
         'audio/ogg' => [
             'vorbis' => 'exiftool',
         ],
-        // WAV (audio)
+        // WAV
         'audio/wav' => [
             'riff' => 'exiftool',
         ],
         'audio/x-wav' => [
             'riff' => 'exiftool',
         ],
-        // AIFF (audio)
+        // AIFF
         'audio/aiff' => [
             'aiff' => 'exiftool',
         ],
         'audio/x-aiff' => [
             'aiff' => 'exiftool',
         ],
-        // FLAC (audio)
+        // FLAC
         'audio/flac' => [
             'flac' => 'exiftool',
             'vorbis' => 'exiftool',
@@ -128,18 +155,32 @@ return [
             'flac' => 'exiftool',
             'vorbis' => 'exiftool',
         ],
-        // M4A (audio)
+        // M4A
         'audio/m4a' => [
             'quicktime' => 'exiftool',
         ],
-        // MP4 (audio)
+        // MP4
         'audio/mp4' => [
             'quicktime' => 'exiftool',
         ],
-        // ZIP (compressed)
+        // AAC
+        'audio/aac' => [
+            'quicktime' => 'exiftool',
+        ],
+        // OPUS
+        'audio/opus' => [
+            'vorbis' => 'exiftool',
+            'opus' => 'exiftool',
+        ],
+        // ZIP
         'application/zip' => [
             'zip' => 'exiftool',
             'exe' => 'exiftool',
+        ],
+        // EPUB
+        'application/epub+zip' => [
+            'xmp' => 'exiftool',
+            'xml' => 'exiftool',
         ],
     ],
 ];

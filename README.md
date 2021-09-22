@@ -21,20 +21,30 @@ Once installed and active, this module has the following features:
 - PDF (application/pdf)
 - DOC (application/msword)
 - DOCX (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+- ODT (application/vnd.oasis.opendocument.text)
+- ODS (application/vnd.oasis.opendocument.spreadsheet)
+- ODP (application/vnd.oasis.opendocument.presentation)
+- PPT (application/vnd.ms-powerpoint)
+- PPTX (application/vnd.openxmlformats-officedocument.presentationml.presentation)
 - RTF (application/rtf)
 - AVI (video/x-msvideo)
 - MP4 (video/mp4)
 - MPG (video/mpeg)
 - WMV (video/x-ms-wmv, video/x-ms-asf)
 - MOV (video/quicktime)
+- OGV (video/ogg)
+- SWF (application/x-shockwave-flash)
 - MP3 (audio/mpeg)
-- OGG, OPUS (audio/ogg)
+- OGG, OGA (audio/ogg)
 - WAV (audio/wav, audio/x-wav)
 - AIFF (audio/aiff, audio/x-aiff)
 - FLAC (audio/flac, audio/x-flac)
 - M4A (audio/m4a)
 - MP4 (audio/mp4)
+- AAC (audio/aac)
+- OPUS (audio/opus)
 - ZIP (application/zip)
+- EPUB (application/epub+zip)
 - [More to be added]
 
 Note that some file extensions or media types may be disallowed in your global settings.
@@ -65,6 +75,10 @@ Note that some file extensions or media types may be disallowed in your global s
 - FLAC
 - ZIP
 - EXE
+- Theora
+- OPUS
+- FlashPix
+- Flash
 - [More to be added]
 
 ## Extractors:
