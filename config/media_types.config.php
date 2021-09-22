@@ -40,7 +40,6 @@ return [
             'exif' => 'exiftool',
             'iccprofile' => 'exiftool',
             'iptc' => 'exiftool',
-            'exif' => 'exiftool',
         ],
         // PSD
         'application/vnd.adobe.photoshop' => [
