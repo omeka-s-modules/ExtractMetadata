@@ -17,12 +17,5 @@
  * last value will overwrite all previous values that use that term.
  */
 return [
-    'extract_metadata_crosswalk' => [
-        'exif' => [
-            'Artist' => 'dcterms:creator',
-            'ImageDescription' => 'dcterms:description',
-            'CreateDate' => 'dcterms:created',
-            'Copyright' => 'dcterms:rights',
-        ],
-    ],
+    'extract_metadata_crosswalk' => [],
 ];
