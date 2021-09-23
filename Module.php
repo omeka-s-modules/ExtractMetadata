@@ -7,6 +7,7 @@ use ExtractMetadata\Entity\ExtractMetadata;
 use Omeka\Entity;
 use Omeka\File\Store\Local;
 use Omeka\Module\AbstractModule;
+use Laminas\Form\Element;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 use Laminas\EventManager\Event;
@@ -73,7 +74,9 @@ SQL;
                     $tempFile->getMediaType(),
                     $media
                 );
-                $this->mapMetadata($media, $metadataEntity->getMetadata());
+                if ($metadataEntity) {
+                    $this->mapMetadata($media, $metadataEntity->getMetadata());
+                }
             }
         );
         /*
@@ -132,18 +135,22 @@ SQL;
                 $valueOptions = [
                     'map_add' => 'Map metadata (add values)', // @translate
                     'map_replace' => 'Map metadata (replace values)', // @translate
-                    '' => '[No action]', // @translate
                 ];
                 $store = $this->getServiceLocator()->get('Omeka\File\Store');
                 if ($store instanceof Local) {
                     // Files must be stored locally to refresh extracted metadata.
-                    $valueOptions = ['refresh' => 'Refresh metadata'] + $valueOptions; // @translate
+                    $valueOptions = [
+                        'refresh' => 'Refresh metadata', // @translate
+                        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
+                        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
+                    ] + $valueOptions;
                 }
                 $form->add([
                     'name' => 'extract_metadata_action',
-                    'type' => 'Laminas\Form\Element\Radio',
+                    'type' => Element\Select::class,
                     'options' => [
                         'label' => 'Extract metadata', // @translate
+                        'empty_option' => '[No action]', // @translate
                         'value_options' => $valueOptions,
                     ],
                     'attributes' => [
@@ -236,14 +243,18 @@ SQL;
                 $valueOptions = [
                     'map_add' => 'Map metadata (add values)', // @translate
                     'map_replace' => 'Map metadata (replace values)', // @translate
-                    '' => '[No action]', // @translate
                 ];
                 if ($store instanceof Local) {
                     // Files must be stored locally to refresh extracted metadata.
-                    $valueOptions = ['refresh' => 'Refresh metadata'] + $valueOptions; // @translate
+                    $valueOptions = [
+                        'refresh' => 'Refresh metadata', // @translate
+                        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
+                        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
+                    ] + $valueOptions;
                 }
-                $element = new \Laminas\Form\Element\Radio('extract_metadata_action');
+                $element = new Element\Select('extract_metadata_action');
                 $element->setLabel('Extract metadata');
+                $element->setEmptyOption('[No action]'); // @translate
                 $element->setValueOptions($valueOptions);
             }
             // Set the metadata entity, if needed.
@@ -359,7 +370,7 @@ SQL;
                     $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
                     foreach ($mediaValues->matching($criteria) as $mediaValue) {
                         if (in_array($mediaValue, $mappedValues)) {
-                            // Do not remove values created during this process.
+                            // Do not remove values already created during this process.
                             continue;
                         }
                         $mediaValues->removeElement($mediaValue);
@@ -381,9 +392,11 @@ SQL;
     /**
      * Perform an extract metadata action.
      *
-     * There are three actions this method can perform:
+     * There are five actions this method can perform:
      *
      * - refresh: (re)extracts metadata from files
+     * - refresh_map_add: (re)extracts metadata from files and maps metadata to property values (adding to existing values)
+     * - refresh_map_replace: (re)extracts metadata from files and maps metadata to property values (replacing existing values)
      * - map_add: maps metadata to property values (adding to existing values)
      * - map_replace: maps metadata to property values (replacing existing values)
      *
@@ -392,12 +405,15 @@ SQL;
      */
     public function performAction(Entity\Media $media, $action)
     {
-        if ('refresh' === $action) {
+        if (in_array($action, ['refresh', 'refresh_map_add', 'refresh_map_replace'])) {
             // Files must be stored locally to refresh extracted metadata.
             $store = $this->getServiceLocator()->get('Omeka\File\Store');
             if ($store instanceof Local) {
                 $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
-                $this->extractMetadata($filePath, $media->getMediaType(), $media);
+                $metadataEntity = $this->extractMetadata($filePath, $media->getMediaType(), $media);
+                if ($metadataEntity && in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
+                    $this->mapMetadata($media, $metadataEntity->getMetadata(), ('refresh_map_replace' === $action));
+                }
             }
         } elseif (in_array($action, ['map_add', 'map_replace'])) {
             $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
