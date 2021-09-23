@@ -1,8 +1,9 @@
 <?php
 /**
- * Register the metadata crosswalk.
+ * Define the metadata crosswalk.
  *
- * Key by metadataType/tagName to term (vocabularyPrefix:propertyLocalName).
+ * Key by metadataType/tagName to term. The term is the vocabulary prefix and
+ * property local name, formatted in this way: prefix:localName.
  *
  * For example:
  *
@@ -11,11 +12,9 @@
  *     'ImageDescription' => 'dcterms:description',
  *     'CreateDate' => 'dcterms:created',
  *     'Copyright' => 'dcterms:rights',
- * ]
- *
- * Note that when using the "map_replace" action, if using identical terms, the
- * last value will overwrite all previous values that use that term.
+ * ],
  */
 return [
-    'extract_metadata_crosswalk' => [],
+    'extract_metadata_crosswalk' => [
+    ],
 ];
