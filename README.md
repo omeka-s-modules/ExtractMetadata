@@ -4,11 +4,18 @@ Extract embedded metadata from files.
 
 Once installed and active, this module has the following features:
 
-- The module adds an "Extract Metadata" vocabulary containing properties where it sets extracted metadata to media.
-- When adding a media, the module will automatically extract metadata from the file and set them to the media.
-- When editing a media or batch editing media, the user can choose to refresh or clear the extracted metadata.
-- When editing an item or batch editing items, the user can choose to refresh or clear the extracted metadata of child media.
-- The user can view the module configuration page to see which extractors are available on their system.
+- When adding a media, the module will automatically
+    - Extract metadata from the file
+    - Save the metadata alongside the media
+- When editing a media or batch editing media, the user can choose to:
+    - Refresh the extracted metadata
+    - Map metadata to media values
+- When editing an item or batch editing items, the user can choose to:
+    - Refresh extracted metadata of child media
+    - Map metadata to child media values
+- The user can view the module configuration page to see:
+    - A list of extractors and whether they are available on their system
+    - A matrix of supported media types and and all their possible metadata types/extractors
 
 ## Supported file formats:
 
@@ -87,19 +94,6 @@ Note that some file extensions or media types may be disallowed in your global s
 Used to extract metadata from many files. Requires [exiftool](https://exiftool.org/).
 
 ### [More to be added, if needed]
-
-## Disabling metadata extraction
-
-You can disable metadata extraction for a specific media type by commenting out
-the media type in the media types file (config/media_types.config.php). For example,
-if you want to disable extractions for MP3 (audio/mpeg) files, comment out the following:
-
-```php
-// 'audio/mpeg' => [
-//     'mpeg' => 'exiftool',
-//     'id3' => 'exiftool',
-// ],
-```
 
 # Copyright
 
