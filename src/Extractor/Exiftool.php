@@ -29,10 +29,8 @@ class Exiftool implements ExtractorInterface
             return false;
         }
         // Use options that maximize machine-readability.
-        //   -tab: Output a tab-delimited list of description/values
-        //   -short: Short output format. Prints tag names instead of descriptions
-        //   -struct: Output structured XMP information instead of flattening to individual tags.
-        $commandArgs = [$commandPath, '-tab -short -struct'];
+        //   -json: Output a JSON list of descriptions/values
+        $commandArgs = [$commandPath, '-json'];
         switch ($metadataType) {
             case 'exif':
                 $commandArgs[] = '-exif:all';
@@ -52,7 +50,7 @@ class Exiftool implements ExtractorInterface
             case 'gif':
                 $commandArgs[] = '-gif:all';
                 break;
-            case 'iccprofile':
+            case 'icc_profile':
                 $commandArgs[] = '-icc_profile:all';
                 break;
             case 'png':
@@ -121,6 +119,9 @@ class Exiftool implements ExtractorInterface
         }
         $commandArgs[] = $filePath;
         $command = implode(' ', $commandArgs);
-        return $this->cli->execute($command);
+        $metadata = json_decode($this->cli->execute($command), true)[0];
+        // "SourceFile" added by exiftool. Remove it.
+        unset($metadata['SourceFile']);
+        return $metadata;
     }
 }

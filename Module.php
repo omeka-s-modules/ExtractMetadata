@@ -1,8 +1,8 @@
 <?php
 namespace ExtractMetadata;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManager;
+use DateTime;
+use ExtractMetadata\Entity\ExtractMetadata;
 use Omeka\Entity;
 use Omeka\File\Store\Local;
 use Omeka\Module\AbstractModule;
@@ -13,131 +13,6 @@ use Laminas\EventManager\SharedEventManagerInterface;
 
 class Module extends AbstractModule
 {
-    const VOCAB_NAMESPACE_URI = 'http://omeka.org/s/vocabs/o-module-extractmetadata#';
-    const VOCAB_PREFIX = 'extractmetadata';
-    const VOCAB_LABEL = 'Extract Metadata';
-    /**
-     * "Extract Metadata" vocabulary properties, keyed by local name. Every
-     * local name is also a metadata type.
-     */
-    const VOCAB_PROPERTIES = [
-        'exif' => [
-            'label' => 'Exif',
-            'comment' => 'Exchangeable Image File',
-        ],
-        'iptc' => [
-            'label' => 'IPTC IIM',
-            'comment' => 'International Press Telecommunications Council Information Interchange Model',
-        ],
-        'xmp' => [
-            'label' => 'XMP',
-            'comment' => 'Extensible Metadata Platform',
-        ],
-        'pdf' => [
-            'label' => 'PDF',
-            'comment' => 'Portable Document Format',
-        ],
-        'photoshop' => [
-            'label' => 'Photoshop IRB',
-            'comment' => null,
-        ],
-        'gif' => [
-            'label' => 'GIF',
-            'comment' => 'Graphics Interchange Format',
-        ],
-        'iccprofile' => [
-            'label' => 'ICC Profile',
-            'comment' => 'International Color Consortium profile',
-        ],
-        'png' => [
-            'label' => 'PNG',
-            'comment' => 'Portable Network Graphics',
-        ],
-        'app14' => [
-            'label' => 'APP14',
-            'comment' => null,
-        ],
-        'riff' => [
-            'label' => 'RIFF',
-            'comment' => 'Resource Interchange File Format',
-        ],
-        'mpeg' => [
-            'label' => 'MPEG',
-            'comment' => 'Moving Picture Experts Group',
-        ],
-        'id3' => [
-            'label' => 'ID3',
-            'comment' => null,
-        ],
-        'svg' => [
-            'label' => 'SVG',
-            'comment' => 'Scalable Vector Graphics',
-        ],
-        'quicktime' => [
-            'label' => 'QuickTime',
-            'comment' => null,
-        ],
-        'vorbis' => [
-            'label' => 'Vorbis',
-            'comment' => null,
-        ],
-        'asf' => [
-            'label' => 'ASF',
-            'comment' => 'Advanced Systems Format',
-        ],
-        'flashpix' => [
-            'label' => 'FlashPix',
-            'comment' => null,
-        ],
-        'zip' => [
-            'label' => 'ZIP',
-            'comment' => null,
-        ],
-        'xml' => [
-            'label' => 'XML',
-            'comment' => null,
-        ],
-        'rtf' => [
-            'label' => 'RTF',
-            'comment' => null,
-        ],
-        'aiff' => [
-            'label' => 'AIFF',
-            'comment' => null,
-        ],
-        'flac' => [
-            'label' => 'FLAC',
-            'comment' => null,
-        ],
-        'zip' => [
-            'label' => 'ZIP',
-            'comment' => null,
-        ],
-        'exe' => [
-            'label' => 'EXE',
-            'comment' => null,
-        ],
-        'theora' => [
-            'label' => 'Theora',
-            'comment' => null,
-        ],
-        'opus' => [
-            'label' => 'OPUS',
-            'comment' => null,
-        ],
-        'flash' => [
-            'label' => 'Flash',
-            'comment' => null,
-        ],
-    ];
-
-    /**
-     * Metadata type properties cache
-     *
-     * @var array
-     */
-    protected $metadataTypeProperties;
-
     public function getConfig()
     {
         return array_merge(
@@ -148,7 +23,22 @@ class Module extends AbstractModule
 
     public function install(ServiceLocatorInterface $services)
     {
-        $this->importVocab($services->get('Omeka\EntityManager'));
+        $sql = <<<'SQL'
+CREATE TABLE extract_metadata (id INT UNSIGNED AUTO_INCREMENT NOT NULL, media_id INT NOT NULL, extracted DATETIME NOT NULL, metadata LONGTEXT NOT NULL COMMENT '(DC2Type:json)', UNIQUE INDEX UNIQ_4DA36818EA9FDD75 (media_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+ALTER TABLE extract_metadata ADD CONSTRAINT FK_4DA36818EA9FDD75 FOREIGN KEY (media_id) REFERENCES media (id) ON DELETE CASCADE;
+SQL;
+        $conn = $services->get('Omeka\Connection');
+        $conn->exec('SET FOREIGN_KEY_CHECKS=0;');
+        $conn->exec($sql);
+        $conn->exec('SET FOREIGN_KEY_CHECKS=1;');
+    }
+
+    public function uninstall(ServiceLocatorInterface $services)
+    {
+        $conn = $services->get('Omeka\Connection');
+        $conn->exec('SET FOREIGN_KEY_CHECKS=0;');
+        $conn->exec('DROP TABLE IF EXISTS extract_metadata;');
+        $conn->exec('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     public function getConfigForm(PhpRenderer $view)
@@ -167,19 +57,16 @@ class Module extends AbstractModule
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
         /*
-         * Before ingesting a media file, extract its metadata and set it to the
-         * media. This will only happen when creating the media.
+         * Extract metadata before ingesting media file. This will only happen
+         * when creating the media.
          */
         $sharedEventManager->attach(
             '*',
             'media.ingest_file.pre',
             function (Event $event) {
+                $media = $event->getTarget();
                 $tempFile = $event->getParam('tempFile');
-                $this->setMetadataToMedia(
-                    $tempFile->getTempPath(),
-                    $event->getTarget(),
-                    $tempFile->getMediaType()
-                );
+                $this->extractMetadata($tempFile->getTempPath(), $media, $tempFile->getMediaType());
             }
         );
         /*
@@ -198,7 +85,7 @@ class Module extends AbstractModule
                 $media = $event->getParam('entity');
                 $data = $request->getContent();
                 $action = $data['extract_metadata_action'] ?? 'default';
-                $this->performActionOnMedia($media, $action);
+                $this->performAction($media, $action);
             }
         );
         /*
@@ -218,7 +105,7 @@ class Module extends AbstractModule
                 $data = $request->getContent();
                 $action = $data['extract_metadata_action'] ?? 'default';
                 foreach ($item->getMedia() as $media) {
-                    $this->performActionOnMedia($media, $action);
+                    $this->performAction($media, $action);
                 }
             }
         );
@@ -236,7 +123,8 @@ class Module extends AbstractModule
                     return;
                 }
                 $valueOptions = [
-                    'clear' => 'Clear metadata', // @translate
+                    'map_add' => 'Map metadata (add values)', // @translate
+                    'map_replace' => 'Map metadata (replace values)', // @translate
                     '' => '[No action]', // @translate
                 ];
                 $store = $this->getServiceLocator()->get('Omeka\File\Store');
@@ -280,7 +168,7 @@ class Module extends AbstractModule
         );
         /*
          * Authorize the "extract_metadata_action" key when preprocessing the
-         * batch update data. This will signal the process to refresh or clear
+         * batch update data. This will signal the process to refresh or map
          * the metadata while updating each resource in the batch.
          */
         $preprocessBatchUpdate = function (Event $event) {
@@ -288,7 +176,7 @@ class Module extends AbstractModule
             $data = $event->getParam('data');
             $rawData = $event->getParam('request')->getContent();
             if (isset($rawData['extract_metadata_action'])
-                && in_array($rawData['extract_metadata_action'], ['refresh', 'clear'])
+                && in_array($rawData['extract_metadata_action'], ['refresh', 'map_add', 'map_replace'])
             ) {
                 $data['extract_metadata_action'] = $rawData['extract_metadata_action'];
             }
@@ -323,38 +211,44 @@ class Module extends AbstractModule
             'view.edit.section_nav',
             $viewEditSectionNav
         );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.show.section_nav',
+            $viewEditSectionNav
+        );
         /*
          * Add an "Extract metadata" section to the item and media edit pages.
          */
         $viewEditFormAfter = function (Event $event) {
             $view = $event->getTarget();
             $store = $this->getServiceLocator()->get('Omeka\File\Store');
-            $refreshRadioButton = null;
-            if ($store instanceof Local) {
-                // Files must be stored locally to refresh extracted text.
-                $refreshRadioButton = sprintf(
-                    '<label><input type="radio" name="extract_metadata_action" value="refresh">%s</label>',
-                    $view->translate('Refresh metadata')
-                );
+            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+            // Set the form element, if needed.
+            $element = null;
+            if ('view.show.after' !== $event->getName()) {
+                $valueOptions = [
+                    'map_add' => 'Map metadata (add values)', // @translate
+                    'map_replace' => 'Map metadata (replace values)', // @translate
+                    '' => '[No action]', // @translate
+                ];
+                if ($store instanceof Local) {
+                    // Files must be stored locally to refresh extracted metadata.
+                    $valueOptions = ['refresh' => 'Refresh metadata'] + $valueOptions; // @translate
+                }
+                $element = new \Laminas\Form\Element\Radio('extract_metadata_action');
+                $element->setLabel('Extract metadata');
+                $element->setValueOptions($valueOptions);
             }
-            $html = sprintf('
-            <div id="extract-metadata" class="section">
-                <div class="field">
-                    <div class="field-meta">
-                        <label for="extract_metadata_action">%s</label>
-                    </div>
-                    <div class="inputs">
-                        %s
-                        <label><input type="radio" name="extract_metadata_action" value="clear">%s</label>
-                        <label><input type="radio" name="extract_metadata_action" value="" checked="checked">%s</label>
-                    </div>
-                </div>
-            </div>',
-            $view->translate('Extract metadata'),
-            $refreshRadioButton,
-            $view->translate('Clear metadata'),
-            $view->translate('[No action]'));
-            echo $html;
+            // Set the metadata entity, if needed.
+            $metadataEntity = null;
+            if ($view->media) {
+                $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
+                    ->findOneBy(['media' => $view->media->id()]);
+            }
+            echo $view->partial('common/extract-metadata-section', [
+                'element' => $element,
+                'metadataEntity' => $metadataEntity,
+            ]);
         };
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
@@ -366,58 +260,22 @@ class Module extends AbstractModule
             'view.edit.form.after',
             $viewEditFormAfter
         );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.show.after',
+            $viewEditFormAfter
+        );
     }
 
     /**
-     * Import the "Extract Metadata" vocabulary.
-     *
-     * This will import the vocabulary and its properties if they are not
-     * already imported. Use this method during upgrade if adding new
-     * properties. Simply add the properties to self::VOCAB_PROPERTIES and call
-     * this method.
-     *
-     * @param EntityManager $entityManager
-     */
-    protected function importVocab(EntityManager $entityManager)
-    {
-        $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
-            ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
-        if (!$vocab) {
-            // The vocabulary doesn't already exist. Create it.
-            $vocab = new Entity\Vocabulary;
-            $vocab->setNamespaceUri(self::VOCAB_NAMESPACE_URI);
-            $vocab->setPrefix(self::VOCAB_PREFIX);
-            $vocab->setLabel(self::VOCAB_LABEL);
-            $entityManager->persist($vocab);
-        }
-        foreach (self::VOCAB_PROPERTIES as $localName => $propertyData) {
-            $property = $entityManager->getRepository(Entity\Property::class)
-                ->findOneBy([
-                    'vocabulary' => $vocab,
-                    'localName' => $localName,
-                ]);
-            if (!$property) {
-                // The property doesn't already exist. Create it.
-                $property = new Entity\Property;
-                $property->setVocabulary($vocab);
-                $property->setLocalName($localName);
-                $property->setLabel($propertyData['label']);
-                $property->setComment($propertyData['comment']);
-                $entityManager->persist($property);
-            }
-        }
-        $entityManager->flush();
-    }
-
-    /**
-     * Set extracted metadata to a media.
+     * Extracted metadata.
      *
      * @param string $filePath
      * @param Entity\Media $media
      * @param string $mediaType
      * @return null|false
      */
-    public function setMetadataToMedia($filePath, Entity\Media $media, $mediaType)
+    public function extractMetadata($filePath, Entity\Media $media, $mediaType)
     {
         if (!@is_file($filePath)) {
             // The file doesn't exist.
@@ -430,17 +288,9 @@ class Module extends AbstractModule
             return;
         }
         $extractors = $services->get('ExtractMetadata\ExtractorManager');
-        $entityManager = $services->get('Omeka\EntityManager');
-        $metadataTypeProperties = $this->getMetadataTypeProperties();
-        $mediaValues = $media->getValues();
-        // Iterate each metadata type, extract the metadata using the extractor,
-        // and set the metadata as value(s) of the media.
+        // Iterate each metadata type, extract the metadata using the extractor.
+        $metadata = [];
         foreach ($config['extract_metadata_media_types'][$mediaType] as $metadataType => $extractorName) {
-            if (!isset($this->metadataTypeProperties[$metadataType])) {
-                // This metadata type does not have a corresponding property.
-                return;
-            }
-            $metadataTypeProperty = $this->metadataTypeProperties[$metadataType];
             try {
                 $extractor = $extractors->get($extractorName);
             } catch (ServiceNotFoundException $e) {
@@ -451,90 +301,47 @@ class Module extends AbstractModule
                 // The extractor is unavailable.
                 continue;
             }
-            // extract() should return false if it cannot extract metadata.
-            $metadata = $extractor->extract($filePath, $metadataType);
-            if (false === $metadata) {
-                // The extractor could not extract metadata from the file.
+            $typeMetadata = $extractor->extract($filePath, $metadataType);
+            if (!is_array($typeMetadata)) {
+                // The extractor did not return an array.
                 continue;
             }
-            $metadata = trim($metadata);
-            if ('' === $metadata) {
-                // The extractor returned an empty string.
-                continue;
-            }
-
-            $isPublic = true;
-            // Clear values.
-            $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $metadataTypeProperty));
-            foreach ($mediaValues->matching($criteria) as $mediaValue) {
-                $isPublic = $mediaValue->getIsPublic();
-                $mediaValues->removeElement($mediaValue);
-            }
-            // Use a property reference to avoid Doctrine's "A new entity was
-            // found" error during batch operations.
-            $metadataTypeProperty = $entityManager->getReference(Entity\Property::class, $metadataTypeProperty->getId());
-            // Create and add the value.
-            $value = new Entity\Value;
-            $value->setResource($media);
-            $value->setType('literal');
-            $value->setProperty($metadataTypeProperty);
-            $value->setValue($metadata);
-            $value->setIsPublic($isPublic);
-            $mediaValues->add($value);
+            $metadata[$metadataType] = $typeMetadata;
         }
+        // Create the metadata record.
+        $entityManager = $services->get('Omeka\EntityManager');
+        $entity = $entityManager->getRepository(ExtractMetadata::class)->findOneBy(['media' => $media]);
+        if (!$entity) {
+            $entity = new ExtractMetadata;
+            $entity->setExtracted(new DateTime('now'));
+            $entity->setMedia($media);
+            $entityManager->persist($entity);
+        }
+        $entity->setMetadata($metadata);
     }
 
     /**
-     * Perform an extract metadata action on a media. There are two actions this
-     * method can perform:
+     * Perform an extract metadata action. There are two actions this method can
+     * perform:
      *
-     * - refresh: (re)extracts metadata from files and sets them to the media
-     * - clear: clears all extracted metadata from the media
+     * - refresh: (re)extracts metadata from files
+     * - map_add: maps metadata to property values (adding to existing values)
+     * - map_replace: maps metadata to property values (replacing existing values)
      *
      * @param Entity\Media $media
      * @param string $action
      */
-    public function performActionOnMedia(Entity\Media $media, $action)
+    public function performAction(Entity\Media $media, $action)
     {
         $store = $this->getServiceLocator()->get('Omeka\File\Store');
         // Files must be stored locally to refresh extracted metadata.
         if (('refresh' === $action) && ($store instanceof Local)) {
             $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
-            $this->setMetadataToMedia($filePath, $media, $media->getMediaType());
-        } elseif ('clear' === $action) {
-            $mediaValues = $media->getValues();
-            foreach ($this->getMetadataTypeProperties() as $metadataTypeProperty) {
-                $criteria = Criteria::create()
-                    ->where(Criteria::expr()->eq('property', $metadataTypeProperty))
-                    ->andWhere(Criteria::expr()->eq('type', 'literal'));
-                foreach ($mediaValues->matching($criteria) as $mediaValue) {
-                    $mediaValues->removeElement($mediaValue);
-                }
-            }
+            $this->extractMetadata($filePath, $media, $media->getMediaType());
+        } elseif ('map_add' === $action) {
+            // @todo
+        } elseif ('map_replace' === $action) {
+            // @todo
         }
-    }
-
-    /**
-     * Get all properties of the "Extract Metadata" vocabulary.
-     *
-     * @return array An array of properties keyed by their local name
-     */
-    public function getMetadataTypeProperties()
-    {
-        if (isset($this->metadataTypeProperties)) {
-            return $this->metadataTypeProperties;
-        }
-        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-        $vocab = $entityManager->getRepository(Entity\Vocabulary::class)
-            ->findOneBy(['namespaceUri' => self::VOCAB_NAMESPACE_URI]);
-        if (!$vocab) {
-            // The "Extract Metadata" vocabulary was deleted.
-            return [];
-        }
-        $this->metadataTypeProperties = [];
-        foreach ($vocab->getProperties() as $property) {
-            $this->metadataTypeProperties[$property->getLocalName()] = $property;
-        }
-        return $this->metadataTypeProperties;
     }
 }

@@ -2,32 +2,36 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
+# Translators:
+# Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2021
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-22 22:20-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2021-09-20 18:27+0000\n"
+"Last-Translator: Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2021\n"
+"Language-Team: Catalan (https://www.transifex.com/omeka/teams/14184/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Module.php:203
 msgid "Extract metadata"
-msgstr ""
+msgstr "Extreu les metadades"
 
 #: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractor"
-msgstr ""
+msgstr "Extractor"
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #: view/common/extract-metadata-config-form.phtml:28
 msgid "Metadata type : Extractor"
@@ -43,8 +47,8 @@ msgstr ""
 
 #: Module.php:130 Module.php:234
 msgid "[No action]"
-msgstr ""
+msgstr "[Sense accions]"
 
 #: Module.php:135 Module.php:238
 msgid "Refresh metadata"
-msgstr ""
+msgstr "Actualitza les metadades"

@@ -1,17 +1,13 @@
 <?php
 /**
  * Register file media types and all their possible metadata types/extractors.
- *
- * The metadata type must correspond to a local name of a property in the
- * "Extract Metadata" vocabulary. The extractor must correspond to a name of
- * a registered extractor.
  */
 return [
     'extract_metadata_media_types' => [
         // JPG, JPEG
         'image/jpeg' => [
             'exif' => 'exiftool',
-            'iccprofile' => 'exiftool',
+            'icc_profile' => 'exiftool',
             'photoshop' => 'exiftool',
             'iptc' => 'exiftool',
             'xmp' => 'exiftool',
@@ -38,7 +34,7 @@ return [
         // TIF, TIFF
         'image/tiff' => [
             'exif' => 'exiftool',
-            'iccprofile' => 'exiftool',
+            'icc_profile' => 'exiftool',
             'iptc' => 'exiftool',
         ],
         // PSD
@@ -46,7 +42,7 @@ return [
             'photoshop' => 'exiftool',
             'iptc' => 'exiftool',
             'xmp' => 'exiftool',
-            'iccprofile' => 'exiftool',
+            'icc_profile' => 'exiftool',
             'exif' => 'exiftool',
         ],
         // PDF

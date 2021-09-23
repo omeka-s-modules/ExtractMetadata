@@ -16,12 +16,12 @@ interface ExtractorInterface
     /**
      * Extract metadata from a file.
      *
-     * Returns the extracted metadata of the file or false if the extractor
-     * could not extract metadata.
+     * Returns the extracted metadata of the file formatted as an array, keyed
+     * by tag name.
      *
      * @param string $filePath The path to a file
-     * @param string $metadataType
-     * @return string|false
+     * @param string $metadataType The type of metadata
+     * @return array
      */
     public function extract($filePath, $metadataType);
 }

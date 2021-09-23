@@ -1,0 +1,8 @@
+<div id="extract-metadata" class="section">
+    <?php if ($element): ?>
+    <?php echo $this->formRow($element); ?>
+    <?php endif; ?>
+    <?php if ($metadataEntity): ?>
+    <pre><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></pre>
+    <?php endif; ?>
+</div>

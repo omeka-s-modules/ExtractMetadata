@@ -30,6 +30,7 @@
     </thead>
     <tbody>
     <?php foreach ($mediaTypes as $mediaType => $mediaTypeData): ?>
+        <?php ksort($mediaTypeData); ?>
         <tr>
             <td><?php echo $mediaType; ?></td>
             <td>
