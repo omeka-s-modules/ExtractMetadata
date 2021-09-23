@@ -23,6 +23,6 @@ return [
             'ImageDescription' => 'dcterms:description',
             'CreateDate' => 'dcterms:created',
             'Copyright' => 'dcterms:rights',
-        ]
+        ],
     ],
 ];
