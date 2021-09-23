@@ -343,6 +343,7 @@ SQL;
         }
         $metadata = $entity->getMetadata();
         $mediaValues = $media->getValues();
+        $mappedValues = [];
         foreach ($config['extract_metadata_crosswalk'] as $metadataType => $crosswalkData) {
             if (!isset($metadata[$metadataType])) {
                 // The metadata does not include this metadata type.
@@ -358,12 +359,14 @@ SQL;
                     // A property does not exist with this term.
                     continue;
                 }
-                $isPublic = true;
                 if ('map_replace' === $action) {
-                    // Clear existing values.
+                    // Remove existing values.
                     $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
                     foreach ($mediaValues->matching($criteria) as $mediaValue) {
-                        $isPublic = $mediaValue->getIsPublic();
+                        if (in_array($mediaValue, $mappedValues)) {
+                            // Do not remove values created during this process.
+                            continue;
+                        }
                         $mediaValues->removeElement($mediaValue);
                     }
                 }
@@ -373,8 +376,9 @@ SQL;
                 $value->setType('literal');
                 $value->setProperty($property);
                 $value->setValue($metadata[$metadataType][$tagName]);
-                $value->setIsPublic($isPublic);
+                $value->setIsPublic(true);
                 $mediaValues->add($value);
+                $mappedValues[] = $value;
             }
         }
     }
