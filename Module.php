@@ -2,6 +2,7 @@
 namespace ExtractMetadata;
 
 use DateTime;
+use Doctrine\Common\Collections\Criteria;
 use ExtractMetadata\Entity\ExtractMetadata;
 use Omeka\Entity;
 use Omeka\File\Store\Local;
@@ -17,7 +18,8 @@ class Module extends AbstractModule
     {
         return array_merge(
             include sprintf('%s/config/module.config.php', __DIR__),
-            include sprintf('%s/config/media_types.config.php', __DIR__)
+            include sprintf('%s/config/extract.config.php', __DIR__),
+            include sprintf('%s/config/crosswalk.config.php', __DIR__)
         );
     }
 
@@ -281,16 +283,15 @@ SQL;
             // The file doesn't exist.
             return;
         }
-        $services = $this->getServiceLocator();
-        $config = $services->get('Config');
-        if (!isset($config['extract_metadata_media_types'][$mediaType])) {
+        $config = $this->getServiceLocator()->get('Config');
+        if (!isset($config['extract_metadata_extract'][$mediaType])) {
             // The media type has no associated extractors.
             return;
         }
-        $extractors = $services->get('ExtractMetadata\ExtractorManager');
+        $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
         // Iterate each metadata type, extract the metadata using the extractor.
         $metadata = [];
-        foreach ($config['extract_metadata_media_types'][$mediaType] as $metadataType => $extractorName) {
+        foreach ($config['extract_metadata_extract'][$mediaType] as $metadataType => $extractorName) {
             try {
                 $extractor = $extractors->get($extractorName);
             } catch (ServiceNotFoundException $e) {
@@ -309,7 +310,7 @@ SQL;
             $metadata[$metadataType] = $typeMetadata;
         }
         // Create the metadata record.
-        $entityManager = $services->get('Omeka\EntityManager');
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
         $entity = $entityManager->getRepository(ExtractMetadata::class)->findOneBy(['media' => $media]);
         if (!$entity) {
             $entity = new ExtractMetadata;
@@ -321,8 +322,67 @@ SQL;
     }
 
     /**
-     * Perform an extract metadata action. There are two actions this method can
-     * perform:
+     * Map metadata using crosswalk.
+     *
+     * There are two actions this method can perform:
+     *
+     * - map_add: maps metadata to property values (adding to existing values)
+     * - map_replace: maps metadata to property values (replacing existing values)
+     *
+     * @param Entity\Media $media
+     * @param string $action
+     */
+    public function mapMetadata(Entity\Media $media, $action)
+    {
+        $config = $this->getServiceLocator()->get('Config');
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $entity = $entityManager->getRepository(ExtractMetadata::class)->findOneBy(['media' => $media]);
+        if (!$entity) {
+            // This media has no metadata.
+            return;
+        }
+        $metadata = $entity->getMetadata();
+        $mediaValues = $media->getValues();
+        foreach ($config['extract_metadata_crosswalk'] as $metadataType => $crosswalkData) {
+            if (!isset($metadata[$metadataType])) {
+                // The metadata does not include this metadata type.
+                continue;
+            }
+            foreach ($crosswalkData as $tagName => $term) {
+                if (!isset($metadata[$metadataType][$tagName])) {
+                    // The metadata does not include this tag name.
+                    continue;
+                }
+                $property = $this->getPropertyByTerm($term);
+                if (!$property) {
+                    // A property does not exist with this term.
+                    continue;
+                }
+                $isPublic = true;
+                if ('map_replace' === $action) {
+                    // Clear existing values.
+                    $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
+                    foreach ($mediaValues->matching($criteria) as $mediaValue) {
+                        $isPublic = $mediaValue->getIsPublic();
+                        $mediaValues->removeElement($mediaValue);
+                    }
+                }
+                // Create and add the value.
+                $value = new Entity\Value;
+                $value->setResource($media);
+                $value->setType('literal');
+                $value->setProperty($property);
+                $value->setValue($metadata[$metadataType][$tagName]);
+                $value->setIsPublic($isPublic);
+                $mediaValues->add($value);
+            }
+        }
+    }
+
+    /**
+     * Perform an extract metadata action.
+     *
+     * There are three actions this method can perform:
      *
      * - refresh: (re)extracts metadata from files
      * - map_add: maps metadata to property values (adding to existing values)
@@ -333,15 +393,39 @@ SQL;
      */
     public function performAction(Entity\Media $media, $action)
     {
-        $store = $this->getServiceLocator()->get('Omeka\File\Store');
-        // Files must be stored locally to refresh extracted metadata.
-        if (('refresh' === $action) && ($store instanceof Local)) {
-            $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
-            $this->extractMetadata($filePath, $media, $media->getMediaType());
-        } elseif ('map_add' === $action) {
-            // @todo
-        } elseif ('map_replace' === $action) {
-            // @todo
+        if ('refresh' === $action) {
+            // Files must be stored locally to refresh extracted metadata.
+            $store = $this->getServiceLocator()->get('Omeka\File\Store');
+            if ($store instanceof Local) {
+                $filePath = $store->getLocalPath(sprintf('original/%s', $media->getFilename()));
+                $this->extractMetadata($filePath, $media, $media->getMediaType());
+            }
+        } elseif (in_array($action, ['map_add', 'map_replace'])) {
+            $this->mapMetadata($media, $action);
         }
+    }
+
+    /**
+     * Get property by term.
+     *
+     * @param string $term vocabularyPrefix:propertyLocalName
+     * @return null|Entity\Property
+     */
+    public function getPropertyByTerm($term)
+    {
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        list($prefix, $localName) = explode(':', $term);
+        $dql = '
+            SELECT p
+            FROM Omeka\Entity\Property p
+            JOIN p.vocabulary v
+            WHERE p.localName = :localName
+            AND v.prefix = :prefix';
+        $query = $entityManager->createQuery($dql);
+        $query->setParameters([
+            'localName' => $localName,
+            'prefix' => $prefix,
+        ]);
+        return $query->getOneOrNullResult();
     }
 }

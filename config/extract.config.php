@@ -3,7 +3,7 @@
  * Register file media types and all their possible metadata types/extractors.
  */
 return [
-    'extract_metadata_media_types' => [
+    'extract_metadata_extract' => [
         // JPG, JPEG
         'image/jpeg' => [
             'exif' => 'exiftool',

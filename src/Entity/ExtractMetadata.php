@@ -47,7 +47,7 @@ class ExtractMetadata extends Entity\AbstractEntity
      *     nullable=false
      * )
      */
-    protected $metadata;
+    protected $metadata = [];
 
     public function getId()
     {
