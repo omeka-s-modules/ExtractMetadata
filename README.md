@@ -4,7 +4,7 @@ Extract embedded metadata from files.
 
 Once installed and active, this module has the following features:
 
-- When adding a media, the module will automatically
+- When adding a media, the module will automatically:
     - Extract metadata from the file
     - Save the metadata alongside the media
 - When editing a media or batch editing media, the user can choose to:
@@ -17,83 +17,97 @@ Once installed and active, this module has the following features:
     - A list of extractors and whether they are available on their system
     - A matrix of supported media types and and all their possible metadata types/extractors
 
-## Supported file formats:
-
-- JPG, JPEG (image/jpeg)
-- PNG (image/png)
-- GIF (image/gif)
-- SVG (image/svg+xml)
-- TIF, TIFF (image/tiff)
-- PSD (application/vnd.adobe.photoshop)
-- PDF (application/pdf)
-- DOC (application/msword)
-- DOCX (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
-- ODT (application/vnd.oasis.opendocument.text)
-- ODS (application/vnd.oasis.opendocument.spreadsheet)
-- ODP (application/vnd.oasis.opendocument.presentation)
-- PPT (application/vnd.ms-powerpoint)
-- PPTX (application/vnd.openxmlformats-officedocument.presentationml.presentation)
-- RTF (application/rtf)
-- AVI (video/x-msvideo)
-- MP4 (video/mp4)
-- MPG (video/mpeg)
-- WMV (video/x-ms-wmv, video/x-ms-asf)
-- MOV (video/quicktime)
-- OGV (video/ogg)
-- SWF (application/x-shockwave-flash)
-- MP3 (audio/mpeg)
-- OGG, OGA (audio/ogg)
-- WAV (audio/wav, audio/x-wav)
-- AIFF (audio/aiff, audio/x-aiff)
-- FLAC (audio/flac, audio/x-flac)
-- M4A (audio/m4a)
-- MP4 (audio/mp4)
-- AAC (audio/aac)
-- OPUS (audio/opus)
-- ZIP (application/zip)
-- EPUB (application/epub+zip)
-- [More to be added]
-
-Note that some file extensions or media types may be disallowed in your global settings.
-
-## Supported metadata types:
-
-- [Exif](https://en.wikipedia.org/wiki/Exif)
-- [IPTC IIM](https://www.iptc.org/standards/iim/)
-- [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform)
-- PDF
-- Photoshop IRB
-- GIF
-- [ICC Profile](https://en.wikipedia.org/wiki/ICC_profile)
-- PNG
-- APP14
-- [RIFF](https://en.wikipedia.org/wiki/Resource_Interchange_File_Format)
-- MPEG
-- [ID3](https://en.wikipedia.org/wiki/ID3)
-- SVG
-- QuickTime
-- Vorbis
-- ASF
-- [FlashPix](https://en.wikipedia.org/wiki/FlashPix)
-- ZIP
-- XML
-- RTF
-- AIFF
-- FLAC
-- ZIP
-- EXE
-- Theora
-- OPUS
-- Flash
-- [More to be added]
-
 ## Extractors:
 
 ### exiftool
 
 Used to extract metadata from many files. Requires [exiftool](https://exiftool.org/).
 
-### [More to be added, if needed]
+### [More can be added]
+
+## Supported media types:
+
+- application/epub+zip (EPUB)
+- application/msword (DOC)
+- application/pdf (PDF)
+- application/rtf (RTF)
+- application/vnd.adobe.photoshop (PSD)
+- application/vnd.ms-powerpoint (PPT)
+- application/vnd.oasis.opendocument.presentation (ODP)
+- application/vnd.oasis.opendocument.spreadsheet (ODS)
+- application/vnd.oasis.opendocument.text (ODT)
+- application/vnd.openxmlformats-officedocument.presentationml.presentation (PPTX)
+- application/vnd.openxmlformats-officedocument.wordprocessingml.document (DOCX)
+- application/x-shockwave-flash (SWF)
+- application/zip (ZIP)
+- audio/aac (AAC)
+- audio/aiff (AIFF)
+- audio/flac (FLAC)
+- audio/m4a (M4A)
+- audio/mp4 (MP4)
+- audio/mpeg (MP3)
+- audio/ogg (OGG, OGA)
+- audio/opus (OPUS)
+- audio/wav (WAV)
+- audio/x-aiff (AIFF)
+- audio/x-flac (FLAC)
+- audio/x-wav (WAV)
+- image/gif (GIF)
+- image/jpeg (JPG, JPEG)
+- image/png (PNG)
+- image/svg+xml (SVG)
+- image/tiff (TIF, TIFF)
+- video/mp4 (MP4)
+- video/mpeg (MPG)
+- video/ogg (OGV)
+- video/quicktime (MOV)
+- video/x-ms-asf (ASF)
+- video/x-ms-wmv (WMV)
+- video/x-msvideo (AVI)
+- [More can be added]
+
+Note that some file extensions or media types may be disallowed in your global settings.
+
+You can register media types and all their possible metadata types/extractors in
+`config/extract.config.php`.
+
+## Supported metadata types:
+
+- AIFF
+- APP14
+- ASF
+- EXE
+- Exif
+- FLAC
+- Flash
+- FlashPix
+- GIF
+- ICC Profile
+- ID3
+- IPTC
+- MPEG
+- OPUS
+- PDF
+- Photoshop IRB
+- PNG
+- QuickTime
+- RIFF
+- RTF
+- SVG
+- Theora
+- Vorbis
+- XML
+- XMP
+- ZIP
+- ZIP
+- [More can be added]
+
+You can register metadata types and their extractors in `config/extract.config.php`.
+
+## Metadata crosswalk
+
+This module adds the ability to map individual pieces of metadata to media values.
+To enable this feature, you must define your own metadata crosswalk in `config/crosswalk.config.php`.
 
 # Copyright
 
