@@ -3,6 +3,16 @@
     <?php echo $this->formRow($element); ?>
     <?php endif; ?>
     <?php if ($metadataEntity): ?>
+    <ul>
+        <li><?php echo sprintf(
+            $this->translate('Last extracted: %s'),
+            $this->i18n()->dateFormat($metadataEntity->getExtracted(), 'long', 'long')
+        ); ?></li>
+        <li><?php echo sprintf(
+            $this->translate('Last mapped: %s'),
+            $metadataEntity->getMapped() ? $this->i18n()->dateFormat($metadataEntity->getMapped(), 'long', 'long') : $this->translate('n/a')
+        ); ?></li>
+    </ul>
     <pre><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></pre>
     <?php endif; ?>
 </div>

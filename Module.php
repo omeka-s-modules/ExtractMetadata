@@ -35,7 +35,7 @@ class Module extends AbstractModule
     public function install(ServiceLocatorInterface $services)
     {
         $sql = <<<'SQL'
-CREATE TABLE extract_metadata (id INT UNSIGNED AUTO_INCREMENT NOT NULL, media_id INT NOT NULL, extracted DATETIME NOT NULL, metadata LONGTEXT NOT NULL COMMENT '(DC2Type:json)', UNIQUE INDEX UNIQ_4DA36818EA9FDD75 (media_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+CREATE TABLE extract_metadata (id INT UNSIGNED AUTO_INCREMENT NOT NULL, media_id INT NOT NULL, extracted DATETIME NOT NULL, mapped DATETIME DEFAULT NULL, metadata LONGTEXT NOT NULL COMMENT '(DC2Type:json)', UNIQUE INDEX UNIQ_4DA36818EA9FDD75 (media_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 ALTER TABLE extract_metadata ADD CONSTRAINT FK_4DA36818EA9FDD75 FOREIGN KEY (media_id) REFERENCES media (id) ON DELETE CASCADE;
 SQL;
         $conn = $services->get('Omeka\Connection');
@@ -57,7 +57,7 @@ SQL;
         $services = $this->getServiceLocator();
         $extractors = $services->get('ExtractMetadata\ExtractorManager');
         $config = $services->get('Config');
-        $mediaTypes = $config['extract_metadata_media_types'];
+        $mediaTypes = $config['extract_metadata_extract'];
         ksort($mediaTypes);
         return $view->partial('common/extract-metadata-config-form', [
             'extractors' => $extractors,
@@ -358,6 +358,7 @@ SQL;
                 $mappedValues[] = $value;
             }
         }
+        $metadataEntity->setMapped(new DateTime('now'));
     }
 
     /**

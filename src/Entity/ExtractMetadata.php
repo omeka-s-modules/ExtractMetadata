@@ -43,6 +43,14 @@ class ExtractMetadata extends Entity\AbstractEntity
 
     /**
      * @Column(
+     *     type="datetime",
+     *     nullable=true
+     * )
+     */
+    protected $mapped;
+
+    /**
+     * @Column(
      *     type="json",
      *     nullable=false
      * )
@@ -72,6 +80,16 @@ class ExtractMetadata extends Entity\AbstractEntity
     public function getExtracted() : DateTime
     {
         return $this->extracted;
+    }
+
+    public function setMapped(DateTime $mapped) : void
+    {
+        $this->mapped = $mapped;
+    }
+
+    public function getMapped() : DateTime
+    {
+        return $this->mapped;
     }
 
     public function setMetadata(array $metadata) : void
