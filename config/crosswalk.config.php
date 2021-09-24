@@ -16,5 +16,11 @@
  */
 return [
     'extract_metadata_crosswalk' => [
+        'exif' => [
+            'Artist' => 'dcterms:creator',
+            'ImageDescription' => 'dcterms:description',
+            'CreateDate' => 'dcterms:created',
+            'Copyright' => 'dcterms:rights',
+        ],
     ],
 ];

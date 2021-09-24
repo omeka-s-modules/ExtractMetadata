@@ -15,6 +15,14 @@ use Laminas\EventManager\SharedEventManagerInterface;
 
 class Module extends AbstractModule
 {
+    const ACTIONS = [
+        'refresh' => 'Refresh metadata', // @translate
+        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
+        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
+        'map_add' => 'Map metadata (add values)', // @translate
+        'map_replace' => 'Map metadata (replace values)', // @translate
+    ];
+
     public function getConfig()
     {
         return array_merge(
@@ -132,32 +140,9 @@ SQL;
                     // This is not a media or item batch update form.
                     return;
                 }
-                $valueOptions = [
-                    'map_add' => 'Map metadata (add values)', // @translate
-                    'map_replace' => 'Map metadata (replace values)', // @translate
-                ];
-                $store = $this->getServiceLocator()->get('Omeka\File\Store');
-                if ($store instanceof Local) {
-                    // Files must be stored locally to refresh extracted metadata.
-                    $valueOptions = [
-                        'refresh' => 'Refresh metadata', // @translate
-                        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
-                        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
-                    ] + $valueOptions;
-                }
-                $form->add([
-                    'name' => 'extract_metadata_action',
-                    'type' => Element\Select::class,
-                    'options' => [
-                        'label' => 'Extract metadata', // @translate
-                        'empty_option' => '[No action]', // @translate
-                        'value_options' => $valueOptions,
-                    ],
-                    'attributes' => [
-                        'value' => '',
-                        'data-collection-action' => 'replace',
-                    ],
-                ]);
+                $element = $this->getActionSelect();
+                $element->setAttribute('data-collection-action', 'replace');
+                $form->add($element);
             }
         );
         /*
@@ -182,15 +167,15 @@ SQL;
         );
         /*
          * Authorize the "extract_metadata_action" key when preprocessing the
-         * batch update data. This will signal the process to refresh or map
-         * the metadata while updating each resource in the batch.
+         * batch update data. This will signal the process to refresh or map the
+         * metadata while updating each resource in the batch.
          */
         $preprocessBatchUpdate = function (Event $event) {
             $adapter = $event->getTarget();
             $data = $event->getParam('data');
             $rawData = $event->getParam('request')->getContent();
             if (isset($rawData['extract_metadata_action'])
-                && in_array($rawData['extract_metadata_action'], ['refresh', 'map_add', 'map_replace'])
+                && in_array($rawData['extract_metadata_action'], array_keys(self::ACTIONS))
             ) {
                 $data['extract_metadata_action'] = $rawData['extract_metadata_action'];
             }
@@ -240,22 +225,7 @@ SQL;
             // Set the form element, if needed.
             $element = null;
             if ('view.show.after' !== $event->getName()) {
-                $valueOptions = [
-                    'map_add' => 'Map metadata (add values)', // @translate
-                    'map_replace' => 'Map metadata (replace values)', // @translate
-                ];
-                if ($store instanceof Local) {
-                    // Files must be stored locally to refresh extracted metadata.
-                    $valueOptions = [
-                        'refresh' => 'Refresh metadata', // @translate
-                        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
-                        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
-                    ] + $valueOptions;
-                }
-                $element = new Element\Select('extract_metadata_action');
-                $element->setLabel('Extract metadata');
-                $element->setEmptyOption('[No action]'); // @translate
-                $element->setValueOptions($valueOptions);
+                $element = $this->getActionSelect();
             }
             // Set the metadata entity, if needed.
             $metadataEntity = null;
@@ -446,5 +416,32 @@ SQL;
             'prefix' => $prefix,
         ]);
         return $query->getOneOrNullResult();
+    }
+
+    /**
+     * Get action select element.
+     *
+     * @return Element\Select
+     */
+    public function getActionSelect()
+    {
+        $valueOptions = [
+            'map_add' => self::ACTIONS['map_add'],
+            'map_replace' => self::ACTIONS['map_replace']
+        ];
+        $store = $this->getServiceLocator()->get('Omeka\File\Store');
+        if ($store instanceof Local) {
+            // Files must be stored locally to refresh extracted metadata.
+            $valueOptions = [
+                'refresh' => self::ACTIONS['refresh'],
+                'refresh_map_add' => self::ACTIONS['refresh_map_add'],
+                'refresh_map_replace' => self::ACTIONS['refresh_map_replace'],
+            ] + $valueOptions;
+        }
+        $element = new Element\Select('extract_metadata_action');
+        $element->setLabel('Extract metadata');
+        $element->setEmptyOption('[No action]'); // @translate
+        $element->setValueOptions($valueOptions);
+        return $element;
     }
 }
