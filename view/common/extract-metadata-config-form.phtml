@@ -1,46 +1,82 @@
-<table class="tablesaw tablesaw-stack">
-    <thead>
-        <tr>
-            <th><?php echo $this->translate('Extractor'); ?></th>
-            <th><?php echo $this->translate('Available'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($extractors->getRegisteredNames() as $extractorName): ?>
-        <?php
-        $extractor = $extractors->get($extractorName);
-        $isAvailable = $extractor->isAvailable()
-            ? sprintf('<span style="color: green;">%s</span>', $this->translate('Yes'))
-            : sprintf('<span style="color: red;">%s</span>', $this->translate('No'));
-        ?>
-        <tr>
-            <td><?php echo $extractorName; ?></td>
-            <td><?php echo $isAvailable; ?></td>
-        </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
-
-<table class="tablesaw tablesaw-stack">
-    <thead>
-        <tr>
-            <th><?php echo $this->translate('Media type'); ?></th>
-            <th><?php echo $this->translate('Metadata type : Extractor'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($mediaTypes as $mediaType => $mediaTypeData): ?>
-        <?php ksort($mediaTypeData); ?>
-        <tr>
-            <td><?php echo $mediaType; ?></td>
-            <td>
-                <ul>
-                <?php foreach ($mediaTypeData as $metadataType => $extractorName): ?>
-                    <li><?php echo sprintf('%s : %s', $metadataType, $extractorName); ?></li>
-                <?php endforeach; ?>
-                </ul>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
+<?php echo $this->sectionNav([
+    'extractors' => $this->translate('Extractors'),
+    'metadata-extract' => $this->translate('Metadata extract'),
+    'metadata-crosswalk' => $this->translate('Metadata crosswalk'),
+]); ?>
+<div id="extractors" class="section active">
+    <table class="tablesaw tablesaw-stack">
+        <thead>
+            <tr>
+                <th><?php echo $this->translate('Extractor'); ?></th>
+                <th><?php echo $this->translate('Available'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($extractors->getRegisteredNames() as $extractorName): ?>
+            <?php
+            $extractor = $extractors->get($extractorName);
+            $isAvailable = $extractor->isAvailable()
+                ? sprintf('<span style="color: green;">%s</span>', $this->translate('Yes'))
+                : sprintf('<span style="color: red;">%s</span>', $this->translate('No'));
+            ?>
+            <tr>
+                <td><?php echo $extractorName; ?></td>
+                <td><?php echo $isAvailable; ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<div id="metadata-extract" class="section">
+    <table class="tablesaw tablesaw-stack">
+        <thead>
+            <tr>
+                <th><?php echo $this->translate('Media type'); ?></th>
+                <th><?php echo $this->translate('Metadata type : Extractor'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($mediaTypes as $mediaType => $mediaTypeData): ?>
+            <?php ksort($mediaTypeData); ?>
+            <tr>
+                <td><?php echo $mediaType; ?></td>
+                <td>
+                    <ul>
+                    <?php foreach ($mediaTypeData as $metadataType => $extractorName): ?>
+                        <li><?php echo sprintf('%s : %s', $metadataType, $extractorName); ?></li>
+                    <?php endforeach; ?>
+                    </ul>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<div id="metadata-crosswalk" class="section">
+    <?php if ($crosswalk): ?>
+    <table class="tablesaw tablesaw-stack">
+        <thead>
+            <tr>
+                <th><?php echo $this->translate('Metadata type'); ?></th>
+                <th><?php echo $this->translate('Tag name : term'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($crosswalk as $metadataType => $metadataTypeData): ?>
+            <tr>
+                <td><?php echo $metadataType; ?></td>
+                <td>
+                    <ul>
+                    <?php foreach ($metadataTypeData as $tagName => $term): ?>
+                        <li><?php echo sprintf('%s : %s', $tagName, $term); ?></li>
+                    <?php endforeach; ?>
+                    </ul>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p><?php echo $this->translate('No crosswalk defined.'); ?></p>
+    <?php endif; ?>
+</div>

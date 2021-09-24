@@ -59,9 +59,11 @@ SQL;
         $config = $services->get('Config');
         $mediaTypes = $config['extract_metadata_extract'];
         ksort($mediaTypes);
+        $crosswalk = $config['extract_metadata_crosswalk'];
         return $view->partial('common/extract-metadata-config-form', [
             'extractors' => $extractors,
             'mediaTypes' => $mediaTypes,
+            'crosswalk' => $crosswalk,
         ]);
     }
 
