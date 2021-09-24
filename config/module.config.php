@@ -34,5 +34,8 @@ return [
         'factories' => [
             'exiftool' => Service\Extractor\ExiftoolFactory::class,
         ],
+        'invokables' => [
+            'exif' => Extractor\Exif::class,
+        ],
     ],
 ];
