@@ -403,7 +403,7 @@ SQL;
     public function getPropertyByTerm($term)
     {
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-        list($prefix, $localName) = explode(':', $term);
+        list($prefix, $localName) = array_pad(explode(':', $term), 2, null);
         $dql = '
             SELECT p
             FROM Omeka\Entity\Property p
