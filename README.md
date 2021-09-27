@@ -5,8 +5,7 @@ Extract embedded metadata from files.
 Once installed and active, this module has the following features:
 
 - When adding a media, the module will automatically:
-    - Extract metadata from the file
-    - Save the metadata alongside the media
+    - Extract metadata from the file and save the metadata alongside the media
     - Map metadata to media values (see [Metadata crosswalk](#metadata-crosswalk))
 - When editing a media or batch editing media, the user can choose to:
     - Refresh the extracted metadata
@@ -15,14 +14,21 @@ Once installed and active, this module has the following features:
     - Refresh extracted metadata of child media
     - Map metadata to child media values (see [Metadata crosswalk](#metadata-crosswalk))
 - The user can view the module configuration page to see:
-    - A list of extractors and whether they are available on their system
-    - A table of supported media types and and all their possible metadata types/extractors
+    - The list of extractors and whether they are available on their system
+    - The table of supported media types and and all their possible metadata types/extractors
+    - The metadata crosswalk (if defined)
 
 ## Extractors:
 
 ### exiftool
 
-Used to extract metadata from many files. Requires [exiftool](https://exiftool.org/).
+Used to extract many types of metadata from many types of files. Requires the
+[exiftool](https://exiftool.org/) command-line application.
+
+### exif
+
+Used to extract EXIF metadata that is commonly found in image files. Requires PHP's
+[exif](https://www.php.net/manual/en/book.exif.php) extension.
 
 ### [More can be added]
 
@@ -67,12 +73,11 @@ Used to extract metadata from many files. Requires [exiftool](https://exiftool.o
 | video/x-ms-asf | ASF
 | video/x-ms-wmv | WMV
 | video/x-msvideo | AVI
-| [More can be added] | 
-
-Note that some file extensions or media types may be disallowed in your global settings.
+| [More can be added] |
 
 You can register media types and all their possible metadata types/extractors in
-`config/extract.config.php`.
+`config/extract.config.php`. Note that some file extensions or media types may be
+disallowed in your global settings.
 
 ## Supported metadata types:
 
