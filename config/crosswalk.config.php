@@ -14,11 +14,5 @@
  */
 return [
     'extract_metadata_crosswalk' => [
-        'exiftool' => [
-            '/IPTC/By-line' => 'dcterms:creator',
-        ],
-        'exif' => [
-            '/IFD0/Artist' => 'dcterms:creator',
-        ],
     ],
 ];

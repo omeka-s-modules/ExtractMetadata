@@ -81,11 +81,12 @@ SQL;
             function (Event $event) {
                 $mediaEntity = $event->getTarget();
                 $tempFile = $event->getParam('tempFile');
-                $this->extractMetadata(
+                $metadataEntities = $this->extractMetadata(
                     $tempFile->getTempPath(),
                     $tempFile->getMediaType(),
                     $mediaEntity
                 );
+                $this->mapMetadata($mediaEntity, $metadataEntities);
             }
         );
         /*
@@ -262,6 +263,7 @@ SQL;
      * @param string $filePath
      * @param string $mediaType
      * @param Entity\Media $mediaEntity
+     * @return array An array of metadata entities
      */
     public function extractMetadata($filePath, $mediaType, Entity\Media $mediaEntity)
     {
@@ -271,6 +273,7 @@ SQL;
         }
         $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $metadataEntities = [];
         foreach ($extractors->getRegisteredNames() as $extractorName) {
             $extractor = $extractors->get($extractorName);
             if (!$extractor->isAvailable()) {
@@ -300,7 +303,9 @@ SQL;
             }
             $metadataEntity->setExtracted(new DateTime('now'));
             $metadataEntity->setMetadata($metadata);
+            $metadataEntities[] = $metadataEntity;
         }
+        return $metadataEntities;
     }
 
     /**
@@ -310,26 +315,24 @@ SQL;
      *
      * @see https://packagist.org/packages/php-jsonpointer/php-jsonpointer
      * @param Entity\Media $mediaEntity
+     * @param array $metadataEntities An array of metadata entities
      * @param bool $replace Replace existing values?
      */
-    public function mapMetadata(Entity\Media $mediaEntity, $replace = false)
+    public function mapMetadata(Entity\Media $mediaEntity, array $metadataEntities, $replace = false)
     {
         $config = $this->getServiceLocator()->get('Config');
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $crosswalk = $config['extract_metadata_crosswalk'];
         $values = $mediaEntity->getValues();
         $valuesToAdd = [];
         $propertiesToClear = [];
-        foreach ($config['extract_metadata_crosswalk'] as $extractorName => $extractData) {
-            $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
-                ->findOneBy([
-                    'media' => $mediaEntity,
-                    'extractor' => $extractorName,
-                ]);
-            if (!$metadataEntity) {
-                // This extractor did not extract metadata for this media.
+        foreach ($metadataEntities as $metadataEntity) {
+            $extractor =  $metadataEntity->getExtractor();
+            if (!isset($crosswalk[$extractor])) {
+                // There are no mappings for this extractor.
                 continue;
             }
-            foreach ($extractData as $pointer => $term) {
+            foreach ($crosswalk[$extractor] as $pointer => $term) {
                 $property = $this->getPropertyByTerm($term);
                 if (!$property) {
                     // A property does not exist with this term.
@@ -358,7 +361,7 @@ SQL;
             }
         }
         if ($replace) {
-            // Clear all values of the specified property.
+            // If replacing values, clear all values of the specified property.
             foreach ($propertiesToClear as $property) {
                 $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
                 foreach ($values->matching($criteria) as $mediaValue) {
@@ -393,9 +396,9 @@ SQL;
             $store = $this->getServiceLocator()->get('Omeka\File\Store');
             if ($store instanceof Local) {
                 $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
-                $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
-                if (in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
-                    $this->mapMetadata($mediaEntity, ('refresh_map_replace' === $action));
+                $metadataEntities = $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
+                if ($metadataEntities && in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
+                    $this->mapMetadata($mediaEntity, $metadataEntities, ('refresh_map_replace' === $action));
                 }
             }
         } elseif (in_array($action, ['map_add', 'map_replace'])) {
