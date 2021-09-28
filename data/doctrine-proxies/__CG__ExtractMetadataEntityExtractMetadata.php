@@ -66,10 +66,10 @@ class ExtractMetadata extends \ExtractMetadata\Entity\ExtractMetadata implements
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'media', 'extracted', 'mapped', 'metadata'];
+            return ['__isInitialized__', 'id', 'media', 'extracted', 'extractor', 'metadata'];
         }
 
-        return ['__isInitialized__', 'id', 'media', 'extracted', 'mapped', 'metadata'];
+        return ['__isInitialized__', 'id', 'media', 'extracted', 'extractor', 'metadata'];
     }
 
     /**
@@ -238,23 +238,23 @@ class ExtractMetadata extends \ExtractMetadata\Entity\ExtractMetadata implements
     /**
      * {@inheritDoc}
      */
-    public function setMapped(\DateTime $mapped): void
+    public function setExtractor(string $extractor): void
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setMapped', [$mapped]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setExtractor', [$extractor]);
 
-        parent::setMapped($mapped);
+        parent::setExtractor($extractor);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getMapped(): \DateTime
+    public function getExtractor(): string
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMapped', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getExtractor', []);
 
-        return parent::getMapped();
+        return parent::getExtractor();
     }
 
     /**

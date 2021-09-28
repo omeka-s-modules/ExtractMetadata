@@ -1,0 +1,5 @@
+{
+    "require": {
+        "php-jsonpointer/php-jsonpointer": "^3"
+    }
+}

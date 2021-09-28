@@ -2,17 +2,12 @@
     <?php if ($element): ?>
     <?php echo $this->formRow($element); ?>
     <?php endif; ?>
-    <?php if ($metadataEntity): ?>
-    <ul>
-        <li><?php echo sprintf(
-            $this->translate('Last extracted: %s'),
-            $this->i18n()->dateFormat($metadataEntity->getExtracted(), 'long', 'long')
-        ); ?></li>
-        <li><?php echo sprintf(
-            $this->translate('Last mapped: %s'),
-            $metadataEntity->getMapped() ? $this->i18n()->dateFormat($metadataEntity->getMapped(), 'long', 'long') : $this->translate('n/a')
-        ); ?></li>
-    </ul>
-    <pre><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></pre>
-    <?php endif; ?>
+    <?php foreach ($metadataEntities as $metadataEntity): ?>
+    <h2><?php echo $metadataEntity->getExtractor(); ?></h2>
+    <p><?php echo sprintf(
+        $this->translate('Last extracted %s.'),
+        $this->i18n()->dateFormat($metadataEntity->getExtracted(), 'long', 'long')
+    ); ?></p>
+    <textarea style="width: 100%; height: 300px;" disabled><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></textarea>
+    <?php endforeach; ?>
 </div>

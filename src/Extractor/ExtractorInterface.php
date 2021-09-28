@@ -14,14 +14,19 @@ interface ExtractorInterface
     public function isAvailable();
 
     /**
-     * Extract metadata from a file.
+     * Can this extractor extract from this media type?
      *
-     * Returns the extracted metadata of the file formatted as an array, keyed
-     * by tag name.
+     * @param string
+     * @return bool
+     */
+    public function canExtract($mediaType);
+
+    /**
+     * Extract metadata from a file and return them as an array.
      *
-     * @param string $filePath The path to a file
-     * @param string $metadataType The type of metadata
+     * @param string $filePath The path to the file
+     * @param string $mediaType The media type of the file
      * @return array
      */
-    public function extract($filePath, $metadataType);
+    public function extract($filePath, $mediaType);
 }

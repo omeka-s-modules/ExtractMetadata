@@ -1,20 +1,24 @@
 <?php
 /**
- * Define the metadata crosswalk.
+ * The metadata crosswalk.
  *
- * Key by metadataType/tagName to term. The term is the vocabulary prefix and
- * property local name, formatted in this way: prefix:localName.
+ * Use pointers defined by https://datatracker.ietf.org/doc/html/rfc6901
  *
- * For example:
+ * For example, to map the "By-line" output of exiftool to Dublin Core Creator:
  *
- * 'exif' => [
- *     'Artist' => 'dcterms:creator',
- *     'ImageDescription' => 'dcterms:description',
- *     'CreateDate' => 'dcterms:created',
- *     'Copyright' => 'dcterms:rights',
+ * 'extract_metadata_crosswalk' => [
+ *     'exiftool' => [
+ *         '/IPTC/By-line' => 'dcterms:creator',
+ *     ],
  * ],
  */
 return [
     'extract_metadata_crosswalk' => [
+        'exiftool' => [
+            '/IPTC/By-line' => 'dcterms:creator',
+        ],
+        'exif' => [
+            '/IFD0/Artist' => 'dcterms:creator',
+        ],
     ],
 ];

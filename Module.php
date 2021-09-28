@@ -7,11 +7,12 @@ use ExtractMetadata\Entity\ExtractMetadata;
 use Omeka\Entity;
 use Omeka\File\Store\Local;
 use Omeka\Module\AbstractModule;
-use Laminas\Form\Element;
-use Laminas\ServiceManager\ServiceLocatorInterface;
-use Laminas\View\Renderer\PhpRenderer;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Form\Element;
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Renderer\PhpRenderer;
 
 class Module extends AbstractModule
 {
@@ -23,11 +24,15 @@ class Module extends AbstractModule
         'map_replace' => 'Map metadata (replace values)', // @translate
     ];
 
+    public function init(ModuleManager $moduleManager)
+    {
+        require_once sprintf('%s/vendor/autoload.php', __DIR__);
+    }
+
     public function getConfig()
     {
         return array_merge(
             include sprintf('%s/config/module.config.php', __DIR__),
-            include sprintf('%s/config/extract.config.php', __DIR__),
             include sprintf('%s/config/crosswalk.config.php', __DIR__)
         );
     }
@@ -35,7 +40,7 @@ class Module extends AbstractModule
     public function install(ServiceLocatorInterface $services)
     {
         $sql = <<<'SQL'
-CREATE TABLE extract_metadata (id INT UNSIGNED AUTO_INCREMENT NOT NULL, media_id INT NOT NULL, extracted DATETIME NOT NULL, mapped DATETIME DEFAULT NULL, metadata LONGTEXT NOT NULL COMMENT '(DC2Type:json)', UNIQUE INDEX UNIQ_4DA36818EA9FDD75 (media_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+CREATE TABLE extract_metadata (id INT UNSIGNED AUTO_INCREMENT NOT NULL, media_id INT NOT NULL, extracted DATETIME NOT NULL, extractor VARCHAR(255) NOT NULL, metadata LONGTEXT NOT NULL COMMENT '(DC2Type:json)', INDEX IDX_4DA36818EA9FDD75 (media_id), UNIQUE INDEX media_extractor (media_id, extractor), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 ALTER TABLE extract_metadata ADD CONSTRAINT FK_4DA36818EA9FDD75 FOREIGN KEY (media_id) REFERENCES media (id) ON DELETE CASCADE;
 SQL;
         $conn = $services->get('Omeka\Connection');
@@ -57,12 +62,9 @@ SQL;
         $services = $this->getServiceLocator();
         $extractors = $services->get('ExtractMetadata\ExtractorManager');
         $config = $services->get('Config');
-        $mediaTypes = $config['extract_metadata_extract'];
-        ksort($mediaTypes);
         $crosswalk = $config['extract_metadata_crosswalk'];
         return $view->partial('common/extract-metadata-config-form', [
             'extractors' => $extractors,
-            'mediaTypes' => $mediaTypes,
             'crosswalk' => $crosswalk,
         ]);
     }
@@ -70,8 +72,8 @@ SQL;
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
         /*
-         * Extract and map metadata before ingesting media file. This will only
-         * happen when creating the media.
+         * Extract metadata before ingesting media file. This will only happen
+         * when creating the media.
          */
         $sharedEventManager->attach(
             '*',
@@ -79,14 +81,11 @@ SQL;
             function (Event $event) {
                 $mediaEntity = $event->getTarget();
                 $tempFile = $event->getParam('tempFile');
-                $metadataEntity = $this->extractMetadata(
+                $this->extractMetadata(
                     $tempFile->getTempPath(),
                     $tempFile->getMediaType(),
                     $mediaEntity
                 );
-                if ($metadataEntity) {
-                    $this->mapMetadata($mediaEntity, $metadataEntity);
-                }
             }
         );
         /*
@@ -230,14 +229,14 @@ SQL;
                 $element = $this->getActionSelect();
             }
             // Set the metadata entity, if needed.
-            $metadataEntity = null;
+            $metadataEntities = [];
             if ($view->media) {
-                $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
-                    ->findOneBy(['media' => $view->media->id()]);
+                $metadataEntities = $entityManager->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $view->media->id()]);
             }
             echo $view->partial('common/extract-metadata-section', [
                 'element' => $element,
-                'metadataEntity' => $metadataEntity,
+                'metadataEntities' => $metadataEntities,
             ]);
         };
         $sharedEventManager->attach(
@@ -258,12 +257,11 @@ SQL;
     }
 
     /**
-     * Extracted metadata.
+     * Extract metadata.
      *
      * @param string $filePath
      * @param string $mediaType
      * @param Entity\Media $mediaEntity
-     * @return null|ExtractMetadata
      */
     public function extractMetadata($filePath, $mediaType, Entity\Media $mediaEntity)
     {
@@ -271,96 +269,107 @@ SQL;
             // The file doesn't exist.
             return;
         }
-        $config = $this->getServiceLocator()->get('Config');
-        if (!isset($config['extract_metadata_extract'][$mediaType])) {
-            // The media type has no associated extractors.
-            return;
-        }
         $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
-        // Iterate each metadata type, extract the metadata using the extractor.
-        $metadata = [];
-        foreach ($config['extract_metadata_extract'][$mediaType] as $metadataType => $extractorName) {
-            try {
-                $extractor = $extractors->get($extractorName);
-            } catch (ServiceNotFoundException $e) {
-                // The extractor cannot be found.
-                continue;
-            }
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        foreach ($extractors->getRegisteredNames() as $extractorName) {
+            $extractor = $extractors->get($extractorName);
             if (!$extractor->isAvailable()) {
                 // The extractor is unavailable.
                 continue;
             }
-            $typeMetadata = $extractor->extract($filePath, $metadataType);
-            if (!is_array($typeMetadata)) {
+            if (!$extractor->canExtract($mediaType)) {
+                // The extractor does not support this media type.
+                continue;
+            }
+            $metadata = $extractor->extract($filePath, $mediaType);
+            if (!is_array($metadata)) {
                 // The extractor did not return an array.
                 continue;
             }
-            $metadata[$metadataType] = $typeMetadata;
-        }
-        // Create the metadata entity.
-        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-        $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)->findOneBy(['media' => $mediaEntity]);
-        if (!$metadataEntity) {
-            $metadataEntity = new ExtractMetadata;
+            // Create the metadata entity.
+            $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
+                ->findOneBy([
+                    'media' => $mediaEntity,
+                    'extractor' => $extractorName,
+                ]);
+            if (!$metadataEntity) {
+                $metadataEntity = new ExtractMetadata;
+                $metadataEntity->setMedia($mediaEntity);
+                $metadataEntity->setExtractor($extractorName);
+                $entityManager->persist($metadataEntity);
+            }
             $metadataEntity->setExtracted(new DateTime('now'));
-            $metadataEntity->setMedia($mediaEntity);
-            $entityManager->persist($metadataEntity);
+            $metadataEntity->setMetadata($metadata);
         }
-        $metadataEntity->setMetadata($metadata);
-        return $metadataEntity;
     }
 
     /**
-     * Map metadata using crosswalk.
+     * Map metadata using the crosswalk.
      *
+     * Uses JSON Pointer for PHP to query the JSON.
+     *
+     * @see https://packagist.org/packages/php-jsonpointer/php-jsonpointer
      * @param Entity\Media $mediaEntity
-     * @param ExtractMetadata $metadataEntity
      * @param bool $replace Replace existing values?
      */
-    public function mapMetadata(Entity\Media $mediaEntity, ExtractMetadata $metadataEntity, $replace = false)
+    public function mapMetadata(Entity\Media $mediaEntity, $replace = false)
     {
         $config = $this->getServiceLocator()->get('Config');
-        $mediaValues = $mediaEntity->getValues();
-        $metadata = $metadataEntity->getMetadata();
-        $mappedValues = [];
-        foreach ($config['extract_metadata_crosswalk'] as $metadataType => $crosswalkData) {
-            if (!isset($metadata[$metadataType])) {
-                // The metadata does not include this metadata type.
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $values = $mediaEntity->getValues();
+        $valuesToAdd = [];
+        $propertiesToClear = [];
+        foreach ($config['extract_metadata_crosswalk'] as $extractorName => $extractData) {
+            $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
+                ->findOneBy([
+                    'media' => $mediaEntity,
+                    'extractor' => $extractorName,
+                ]);
+            if (!$metadataEntity) {
+                // This extractor did not extract metadata for this media.
                 continue;
             }
-            foreach ($crosswalkData as $tagName => $term) {
-                if (!isset($metadata[$metadataType][$tagName])) {
-                    // The metadata does not include this tag name.
-                    continue;
-                }
+            foreach ($extractData as $pointer => $term) {
                 $property = $this->getPropertyByTerm($term);
                 if (!$property) {
                     // A property does not exist with this term.
                     continue;
                 }
-                if ($replace) {
-                    // Remove existing values.
-                    $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
-                    foreach ($mediaValues->matching($criteria) as $mediaValue) {
-                        if (in_array($mediaValue, $mappedValues)) {
-                            // Do not remove values already created during this process.
-                            continue;
-                        }
-                        $mediaValues->removeElement($mediaValue);
-                    }
+                $propertiesToClear[] = $property;
+                try {
+                    $jsonPointer = new \Rs\Json\Pointer(json_encode($metadataEntity->getMetadata()));
+                    $valueString = $jsonPointer->get($pointer);
+                } catch (\Exception $e) {
+                    // Invalid JSON, invalid pointer, or nonexistent value.
+                    continue;
+                }
+                if (!is_string($valueString)) {
+                    // The pointer did not resolve to a string.
+                    continue;
                 }
                 // Create and add the value.
                 $value = new Entity\Value;
                 $value->setResource($mediaEntity);
                 $value->setType('literal');
                 $value->setProperty($property);
-                $value->setValue($metadata[$metadataType][$tagName]);
+                $value->setValue($valueString);
                 $value->setIsPublic(true);
-                $mediaValues->add($value);
-                $mappedValues[] = $value;
+                $valuesToAdd[] = $value;
             }
         }
-        $metadataEntity->setMapped(new DateTime('now'));
+        if ($replace) {
+            // Clear all values of the specified property.
+            foreach ($propertiesToClear as $property) {
+                $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
+                foreach ($values->matching($criteria) as $mediaValue) {
+                    $values->removeElement($mediaValue);
+                }
+            }
+        }
+        // Add values to the media.
+        foreach ($valuesToAdd as $value) {
+            $values->add($value);
+        }
     }
 
     /**
@@ -384,17 +393,13 @@ SQL;
             $store = $this->getServiceLocator()->get('Omeka\File\Store');
             if ($store instanceof Local) {
                 $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
-                $metadataEntity = $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
-                if ($metadataEntity && in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
-                    $this->mapMetadata($mediaEntity, $metadataEntity, ('refresh_map_replace' === $action));
+                $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
+                if (in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
+                    $this->mapMetadata($mediaEntity, ('refresh_map_replace' === $action));
                 }
             }
         } elseif (in_array($action, ['map_add', 'map_replace'])) {
-            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-            $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)->findOneBy(['media' => $mediaEntity]);
-            if ($metadataEntity) {
-                $this->mapMetadata($mediaEntity, $metadataEntity, ('map_replace' === $action));
-            }
+            $this->mapMetadata($mediaEntity, ('map_replace' === $action));
         }
     }
 
@@ -431,7 +436,7 @@ SQL;
     {
         $valueOptions = [
             'map_add' => self::ACTIONS['map_add'],
-            'map_replace' => self::ACTIONS['map_replace']
+            'map_replace' => self::ACTIONS['map_replace'],
         ];
         $store = $this->getServiceLocator()->get('Omeka\File\Store');
         if ($store instanceof Local) {

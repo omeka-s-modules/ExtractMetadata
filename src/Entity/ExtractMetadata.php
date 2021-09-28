@@ -6,6 +6,15 @@ use Omeka\Entity;
 
 /**
  * @Entity
+ *
+ * @Table(
+ *     uniqueConstraints={
+ *         @UniqueConstraint(
+ *             name="media_extractor",
+ *             columns={"media_id", "extractor"}
+ *         )
+ *     }
+ * )
  */
 class ExtractMetadata extends Entity\AbstractEntity
 {
@@ -26,7 +35,6 @@ class ExtractMetadata extends Entity\AbstractEntity
      *     targetEntity="Omeka\Entity\Media"
      * )
      * @JoinColumn(
-     *     unique=true,
      *     nullable=false,
      *     onDelete="CASCADE"
      * )
@@ -43,11 +51,11 @@ class ExtractMetadata extends Entity\AbstractEntity
 
     /**
      * @Column(
-     *     type="datetime",
-     *     nullable=true
+     *     type="string",
+     *     nullable=false
      * )
      */
-    protected $mapped;
+    protected $extractor;
 
     /**
      * @Column(
@@ -82,14 +90,14 @@ class ExtractMetadata extends Entity\AbstractEntity
         return $this->extracted;
     }
 
-    public function setMapped(DateTime $mapped) : void
+    public function setExtractor(string $extractor) : void
     {
-        $this->mapped = $mapped;
+        $this->extractor = $extractor;
     }
 
-    public function getMapped() : DateTime
+    public function getExtractor() : string
     {
-        return $this->mapped;
+        return $this->extractor;
     }
 
     public function setMetadata(array $metadata) : void

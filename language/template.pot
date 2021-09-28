@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 10:54-0400\n"
+"POT-Creation-Date: 2021-09-27 21:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,34 +17,60 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:203
+#: Module.php:201
 msgid "Extract metadata"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:4
+#: view/common/extract-metadata-config-form.phtml:2
+msgid "Extractors"
+msgstr ""
+
+#: view/common/extract-metadata-config-form.phtml:3
+msgid "Metadata crosswalk"
+msgstr ""
+
+#: view/common/extract-metadata-config-form.phtml:9
+#: view/common/extract-metadata-config-form.phtml:34
 msgid "Extractor"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:5
+#: view/common/extract-metadata-config-form.phtml:10
 msgid "Available"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:28
-msgid "Metadata type : Extractor"
+#: view/common/extract-metadata-config-form.phtml:35
+msgid "Pointer"
 msgstr ""
 
-#: Module.php:128 Module.php:232
+#: view/common/extract-metadata-config-form.phtml:52
+msgid "No crosswalk defined."
+msgstr ""
+
+#: view/common/extract-metadata-section.phtml:8
+#, php-format
+msgid "Last extracted %s."
+msgstr ""
+
+#: Module.php:20
+msgid "Refresh metadata"
+msgstr ""
+
+#: Module.php:21
+msgid "Refresh and map metadata (add values)"
+msgstr ""
+
+#: Module.php:22
+msgid "Refresh and map metadata (replace values)"
+msgstr ""
+
+#: Module.php:23
 msgid "Map metadata (add values)"
 msgstr ""
 
-#: Module.php:129 Module.php:233
+#: Module.php:24
 msgid "Map metadata (replace values)"
 msgstr ""
 
-#: Module.php:130 Module.php:234
+#: Module.php:452
 msgid "[No action]"
-msgstr ""
-
-#: Module.php:135 Module.php:238
-msgid "Refresh metadata"
 msgstr ""
