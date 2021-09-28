@@ -36,6 +36,7 @@ return [
         ],
         'invokables' => [
             'exif' => Extractor\Exif::class,
+            'getid3' => Extractor\Getid3::class,
         ],
     ],
 ];

@@ -15,7 +15,6 @@ Once installed and active, this module has the following features:
     - Map metadata to child media values (see [Metadata crosswalk](#metadata-crosswalk))
 - The user can view the module configuration page to see:
     - The list of extractors and whether they are available on their system
-    - The table of supported media types and and all their possible metadata types/extractors
     - The metadata crosswalk (if defined)
 
 ## Extractors:
@@ -27,90 +26,14 @@ Used to extract many types of metadata from many types of files. Requires the
 
 ### exif
 
-Used to extract EXIF metadata that is commonly found in image files. Requires PHP's
-[exif](https://www.php.net/manual/en/book.exif.php) extension.
+Used to extract EXIF metadata that is commonly found in JPEG and TIFF files. Requires
+PHP's [exif](https://www.php.net/manual/en/book.exif.php) extension.
+
+### getID3
+
+Used to extract many types of metadata from many types of files.
 
 ### [More can be added]
-
-## Supported media types:
-
-| Media type | File extension
-|-|-
-| application/epub+zip | EPUB
-| application/msword | DOC
-| application/pdf | PDF
-| application/rtf | RTF
-| application/vnd.adobe.photoshop | PSD
-| application/vnd.ms-powerpoint | PPT
-| application/vnd.oasis.opendocument.presentation | ODP
-| application/vnd.oasis.opendocument.spreadsheet | ODS
-| application/vnd.oasis.opendocument.text | ODT
-| application/vnd.openxmlformats-officedocument.presentationml.presentation | PPTX
-| application/vnd.openxmlformats-officedocument.wordprocessingml.document | DOCX
-| application/x-shockwave-flash | SWF
-| application/zip | ZIP
-| audio/aac | AAC
-| audio/aiff | AIFF
-| audio/flac | FLAC
-| audio/m4a | M4A
-| audio/mp4 | MP4
-| audio/mpeg | MP3
-| audio/ogg | OGG, OGA
-| audio/opus | OPUS
-| audio/wav | WAV
-| audio/x-aiff | AIFF
-| audio/x-flac | FLAC
-| audio/x-wav | WAV
-| image/gif | GIF
-| image/jpeg | JPG, JPEG
-| image/png | PNG
-| image/svg+xml | SVG
-| image/tiff | TIF, TIFF
-| video/mp4 | MP4
-| video/mpeg | MPG
-| video/ogg | OGV
-| video/quicktime | MOV
-| video/x-ms-asf | ASF
-| video/x-ms-wmv | WMV
-| video/x-msvideo | AVI
-| [More can be added] |
-
-You can register media types and all their possible metadata types/extractors in
-`config/extract.config.php`. Note that some file extensions or media types may be
-disallowed in your global settings.
-
-## Supported metadata types:
-
-- AIFF
-- APP14
-- ASF
-- EXE
-- Exif
-- FLAC
-- Flash
-- FlashPix
-- GIF
-- ICC Profile
-- ID3
-- IPTC
-- MPEG
-- OPUS
-- PDF
-- Photoshop IRB
-- PNG
-- QuickTime
-- RIFF
-- RTF
-- SVG
-- Theora
-- Vorbis
-- XML
-- XMP
-- ZIP
-- ZIP
-- [More can be added]
-
-You can register metadata types and their extractors in `config/extract.config.php`.
 
 ## Metadata crosswalk
 
