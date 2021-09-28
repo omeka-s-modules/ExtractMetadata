@@ -289,6 +289,14 @@ SQL;
                 // The extractor did not return an array.
                 continue;
             }
+            // Avoid JSON and character encoding errors by encoding the metadata
+            // into JSON and back into an array, ignoring invalid UTF-8. Invalid
+            // JSON would break on the Doctrine level, so we include this here.
+            $metadata = json_decode(json_encode($metadata, JSON_INVALID_UTF8_IGNORE), true);
+            if (!$metadata) {
+                // Could not convert array to JSON.
+                continue;
+            }
             // Create the metadata entity.
             $metadataEntity = $entityManager->getRepository(ExtractMetadata::class)
                 ->findOneBy([
@@ -313,7 +321,7 @@ SQL;
      *
      * Uses JSON Pointer for PHP to query the JSON.
      *
-     * @see https://packagist.org/packages/php-jsonpointer/php-jsonpointer
+     * @see https://github.com/raphaelstolt/php-jsonpointer
      * @param Entity\Media $mediaEntity
      * @param array $metadataEntities An array of metadata entities
      * @param bool $replace Replace existing values?
