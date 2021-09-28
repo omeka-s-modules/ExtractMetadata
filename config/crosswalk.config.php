@@ -14,5 +14,8 @@
  */
 return [
     'extract_metadata_crosswalk' => [
+         'exiftool' => [
+             '/IPTC/By-line' => 'dcterms:creator',
+         ],
     ],
 ];

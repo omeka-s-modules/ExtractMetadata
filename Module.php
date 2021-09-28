@@ -4,15 +4,16 @@ namespace ExtractMetadata;
 use DateTime;
 use Doctrine\Common\Collections\Criteria;
 use ExtractMetadata\Entity\ExtractMetadata;
-use Omeka\Entity;
-use Omeka\File\Store\Local;
-use Omeka\Module\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Form\Element;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
+use Omeka\Entity;
+use Omeka\File\Store\Local;
+use Omeka\Module\AbstractModule;
+use Rs\Json\Pointer;
 
 class Module extends AbstractModule
 {
@@ -348,7 +349,7 @@ SQL;
                 }
                 $propertiesToClear[] = $property;
                 try {
-                    $jsonPointer = new \Rs\Json\Pointer(json_encode($metadataEntity->getMetadata()));
+                    $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
                     $valueString = $jsonPointer->get($pointer);
                 } catch (\Exception $e) {
                     // Invalid JSON, invalid pointer, or nonexistent value.
@@ -399,18 +400,37 @@ SQL;
      */
     public function performAction(Entity\Media $mediaEntity, $action)
     {
-        if (in_array($action, ['refresh', 'refresh_map_add', 'refresh_map_replace'])) {
-            // Files must be stored locally to refresh extracted metadata.
-            $store = $this->getServiceLocator()->get('Omeka\File\Store');
-            if ($store instanceof Local) {
-                $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
-                $metadataEntities = $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
-                if ($metadataEntities && in_array($action, ['refresh_map_add', 'refresh_map_replace'])) {
+        if (!in_array($action, array_keys(self::ACTIONS))) {
+            // This is an invalid action.
+            return;
+        }
+        switch ($action) {
+            case 'refresh':
+                // Files must be stored locally to refresh extracted metadata.
+                $store = $this->getServiceLocator()->get('Omeka\File\Store');
+                if ($store instanceof Local) {
+                    $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
+                    $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
+                }
+                break;
+            case 'refresh_map_add':
+            case 'refresh_map_replace':
+                // Files must be stored locally to refresh extracted metadata.
+                $store = $this->getServiceLocator()->get('Omeka\File\Store');
+                if ($store instanceof Local) {
+                    $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
+                    $metadataEntities = $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
                     $this->mapMetadata($mediaEntity, $metadataEntities, ('refresh_map_replace' === $action));
                 }
-            }
-        } elseif (in_array($action, ['map_add', 'map_replace'])) {
-            $this->mapMetadata($mediaEntity, ('map_replace' === $action));
+                break;
+            case 'map_add':
+            case 'map_replace':
+                $metadataEntities = $this->getServiceLocator()
+                    ->get('Omeka\EntityManager')
+                    ->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $mediaEntity]);
+                $this->mapMetadata($mediaEntity, $metadataEntities, ('map_replace' === $action));
+                break;
         }
     }
 
