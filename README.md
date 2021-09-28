@@ -19,10 +19,10 @@ Once installed and active, this module has the following features:
 
 ## Extractors:
 
-### exiftool
+### ExifTool
 
 Used to extract many types of metadata from many types of files. Requires the
-[exiftool](https://exiftool.org/) command-line application.
+[ExifTool](https://exiftool.org/) command-line application.
 
 ### exif
 
@@ -31,7 +31,8 @@ PHP's [exif](https://www.php.net/manual/en/book.exif.php) extension.
 
 ### getID3
 
-Used to extract many types of metadata from many types of files.
+Used to extract many types of metadata from many types of files. Uses the
+[getID3](https://github.com/JamesHeinrich/getID3) PHP library.
 
 ### [More can be added]
 
