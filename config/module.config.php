@@ -33,10 +33,16 @@ return [
     'extract_metadata_extractors' => [
         'factories' => [
             'exiftool' => Service\Extractor\ExiftoolFactory::class,
+            'tika' => Service\Extractor\TikaFactory::class,
         ],
         'invokables' => [
             'exif' => Extractor\Exif::class,
             'getid3' => Extractor\Getid3::class,
+        ],
+    ],
+    'extract_metadata_extractor_config' => [
+        'tika' => [
+            'jar_path' => '',
         ],
     ],
 ];
