@@ -45,8 +45,9 @@ under `[extract_metadata_extractor_config][tika][jar_path]`.
 
 ## Metadata crosswalk
 
-This module adds the ability to map individual pieces of metadata to media values.
-To enable this feature, you must define your own metadata crosswalk in `config/crosswalk.config.php`.
+This module adds the ability to map individual pieces of metadata to media and item
+values. To enable this feature, you must define your own metadata crosswalk in
+`config/crosswalk.config.php`.
 
 # Copyright
 

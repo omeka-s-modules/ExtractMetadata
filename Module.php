@@ -329,9 +329,11 @@ SQL;
         $config = $this->getServiceLocator()->get('Config');
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
         $crosswalk = $config['extract_metadata_crosswalk'];
-        $values = $mediaEntity->getValues();
-        $valuesToAdd = [];
-        $propertiesToClear = [];
+        $itemEntity = $mediaEntity->getItem();
+        $mediaValues = $mediaEntity->getValues();
+        $itemValues = $itemEntity->getValues();
+        $propertiesToClear = ['media' => [], 'item' =>[]];
+        $valuesToAdd = ['media' => [], 'item' => []];
         foreach ($metadataEntities as $metadataEntity) {
             $extractor =  $metadataEntity->getExtractor();
             if (!isset($crosswalk[$extractor])) {
@@ -339,12 +341,8 @@ SQL;
                 continue;
             }
             foreach ($crosswalk[$extractor] as $map) {
-                if (!isset($map['pointer'])) {
-                    // This map has no pointer.
-                    continue;
-                }
-                if (!isset($map['term'])) {
-                    // This map has no term.
+                if (!isset($map['media'], $map['item'], $map['pointer'], $map['term'], $map['replace'])) {
+                    // All keys are required.
                     continue;
                 }
                 $property = $this->getPropertyByTerm($map['term']);
@@ -352,9 +350,14 @@ SQL;
                     // This term has no property.
                     continue;
                 }
-                if (isset($map['replace_values']) && $map['replace_values']) {
+                if ($map['replace']) {
                     // Set properties to clear if configured to do so.
-                    $propertiesToClear[] = $property;
+                    if ($map['media']) {
+                        $propertiesToClear['media'][] = $property;
+                    }
+                    if ($map['item']) {
+                        $propertiesToClear['item'][] = $property;
+                    }
                 }
                 try {
                     $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
@@ -368,25 +371,45 @@ SQL;
                     continue;
                 }
                 // Create and add the value.
-                $value = new Entity\Value;
-                $value->setResource($mediaEntity);
-                $value->setType('literal');
-                $value->setProperty($property);
-                $value->setValue($valueString);
-                $value->setIsPublic(true);
-                $valuesToAdd[] = $value;
+                if ($map['media']) {
+                    $value = new Entity\Value;
+                    $value->setResource($mediaEntity);
+                    $value->setType('literal');
+                    $value->setProperty($property);
+                    $value->setValue($valueString);
+                    $value->setIsPublic(true);
+                    $valuesToAdd['media'][] = $value;
+                }
+                if ($map['item']) {
+                    $value = new Entity\Value;
+                    $value->setResource($itemEntity);
+                    $value->setType('literal');
+                    $value->setProperty($property);
+                    $value->setValue($valueString);
+                    $value->setIsPublic(true);
+                    $valuesToAdd['item'][] = $value;
+                }
             }
         }
-        // Remove values if there are properties to clear.
-        foreach ($propertiesToClear as $property) {
+        // Remove values.
+        foreach ($propertiesToClear['media'] as $property) {
             $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
-            foreach ($values->matching($criteria) as $mediaValue) {
-                $values->removeElement($mediaValue);
+            foreach ($mediaValues->matching($criteria) as $mediaValue) {
+                $mediaValues->removeElement($mediaValue);
             }
         }
-        // Add values to the media.
-        foreach ($valuesToAdd as $value) {
-            $values->add($value);
+        foreach ($propertiesToClear['item'] as $property) {
+            $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
+            foreach ($itemValues->matching($criteria) as $itemValue) {
+                $itemValues->removeElement($itemValue);
+            }
+        }
+        // Add values.
+        foreach ($valuesToAdd['media'] as $value) {
+            $mediaValues->add($value);
+        }
+        foreach ($valuesToAdd['item'] as $value) {
+            $itemValues->add($value);
         }
     }
 
