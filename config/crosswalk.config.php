@@ -30,24 +30,5 @@
  */
 return [
     'extract_metadata_crosswalk' => [
-        'exiftool' => [
-            [
-                'pointer' => '/IPTC/By-line',
-                'term' => 'dcterms:creator',
-                'replace_values' => false,
-            ],
-            [
-                'pointer' => '/EXIF/Copyright',
-                'term' => 'dcterms:rights',
-                'replace_values' => true,
-            ],
-        ],
-        'getid3' => [
-            [
-                'pointer' => '/jpg/exif/IFD0/ImageDescription',
-                'term' => 'dcterms:description',
-                'replace_values' => true,
-            ],
-        ],
     ],
 ];
