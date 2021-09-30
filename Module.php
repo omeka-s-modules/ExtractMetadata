@@ -19,10 +19,8 @@ class Module extends AbstractModule
 {
     const ACTIONS = [
         'refresh' => 'Refresh metadata', // @translate
-        'refresh_map_add' => 'Refresh and map metadata (add values)', // @translate
-        'refresh_map_replace' => 'Refresh and map metadata (replace values)', // @translate
-        'map_add' => 'Map metadata (add values)', // @translate
-        'map_replace' => 'Map metadata (replace values)', // @translate
+        'refresh_map' => 'Refresh and map metadata', // @translate
+        'map' => 'Map metadata', // @translate
     ];
 
     public function init(ModuleManager $moduleManager)
@@ -325,9 +323,8 @@ SQL;
      * @see https://github.com/raphaelstolt/php-jsonpointer
      * @param Entity\Media $mediaEntity
      * @param array $metadataEntities An array of metadata entities
-     * @param bool $replace Replace existing values?
      */
-    public function mapMetadata(Entity\Media $mediaEntity, array $metadataEntities, $replace = false)
+    public function mapMetadata(Entity\Media $mediaEntity, array $metadataEntities)
     {
         $config = $this->getServiceLocator()->get('Config');
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
@@ -338,19 +335,30 @@ SQL;
         foreach ($metadataEntities as $metadataEntity) {
             $extractor =  $metadataEntity->getExtractor();
             if (!isset($crosswalk[$extractor])) {
-                // There are no mappings for this extractor.
+                // This extractor has no mappings.
                 continue;
             }
-            foreach ($crosswalk[$extractor] as $pointer => $term) {
-                $property = $this->getPropertyByTerm($term);
-                if (!$property) {
-                    // A property does not exist with this term.
+            foreach ($crosswalk[$extractor] as $map) {
+                if (!isset($map['pointer'])) {
+                    // This map has no pointer.
                     continue;
                 }
-                $propertiesToClear[] = $property;
+                if (!isset($map['term'])) {
+                    // This map has no term.
+                    continue;
+                }
+                $property = $this->getPropertyByTerm($map['term']);
+                if (!$property) {
+                    // This term has no property.
+                    continue;
+                }
+                if (isset($map['replace_values']) && $map['replace_values']) {
+                    // Set properties to clear if configured to do so.
+                    $propertiesToClear[] = $property;
+                }
                 try {
                     $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
-                    $valueString = $jsonPointer->get($pointer);
+                    $valueString = $jsonPointer->get($map['pointer']);
                 } catch (\Exception $e) {
                     // Invalid JSON, invalid pointer, or nonexistent value.
                     continue;
@@ -369,13 +377,11 @@ SQL;
                 $valuesToAdd[] = $value;
             }
         }
-        if ($replace) {
-            // If replacing values, clear all values of the specified property.
-            foreach ($propertiesToClear as $property) {
-                $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
-                foreach ($values->matching($criteria) as $mediaValue) {
-                    $values->removeElement($mediaValue);
-                }
+        // Remove values if there are properties to clear.
+        foreach ($propertiesToClear as $property) {
+            $criteria = Criteria::create()->where(Criteria::expr()->eq('property', $property));
+            foreach ($values->matching($criteria) as $mediaValue) {
+                $values->removeElement($mediaValue);
             }
         }
         // Add values to the media.
@@ -386,14 +392,6 @@ SQL;
 
     /**
      * Perform an extract metadata action.
-     *
-     * There are five actions this method can perform:
-     *
-     * - refresh: (re)extracts metadata from files
-     * - refresh_map_add: (re)extracts metadata from files and maps metadata to property values (adding to existing values)
-     * - refresh_map_replace: (re)extracts metadata from files and maps metadata to property values (replacing existing values)
-     * - map_add: maps metadata to property values (adding to existing values)
-     * - map_replace: maps metadata to property values (replacing existing values)
      *
      * @param Entity\Media $mediaEntity
      * @param string $action
@@ -413,23 +411,21 @@ SQL;
                     $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
                 }
                 break;
-            case 'refresh_map_add':
-            case 'refresh_map_replace':
+            case 'refresh_map':
                 // Files must be stored locally to refresh extracted metadata.
                 $store = $this->getServiceLocator()->get('Omeka\File\Store');
                 if ($store instanceof Local) {
                     $filePath = $store->getLocalPath(sprintf('original/%s', $mediaEntity->getFilename()));
                     $metadataEntities = $this->extractMetadata($filePath, $mediaEntity->getMediaType(), $mediaEntity);
-                    $this->mapMetadata($mediaEntity, $metadataEntities, ('refresh_map_replace' === $action));
+                    $this->mapMetadata($mediaEntity, $metadataEntities);
                 }
                 break;
-            case 'map_add':
-            case 'map_replace':
+            case 'map':
                 $metadataEntities = $this->getServiceLocator()
                     ->get('Omeka\EntityManager')
                     ->getRepository(ExtractMetadata::class)
                     ->findBy(['media' => $mediaEntity]);
-                $this->mapMetadata($mediaEntity, $metadataEntities, ('map_replace' === $action));
+                $this->mapMetadata($mediaEntity, $metadataEntities);
                 break;
         }
     }
@@ -466,16 +462,14 @@ SQL;
     public function getActionSelect()
     {
         $valueOptions = [
-            'map_add' => self::ACTIONS['map_add'],
-            'map_replace' => self::ACTIONS['map_replace'],
+            'map' => self::ACTIONS['map'],
         ];
         $store = $this->getServiceLocator()->get('Omeka\File\Store');
         if ($store instanceof Local) {
             // Files must be stored locally to refresh extracted metadata.
             $valueOptions = [
                 'refresh' => self::ACTIONS['refresh'],
-                'refresh_map_add' => self::ACTIONS['refresh_map_add'],
-                'refresh_map_replace' => self::ACTIONS['refresh_map_replace'],
+                'refresh_map' => self::ACTIONS['refresh_map'],
             ] + $valueOptions;
         }
         $element = new Element\Select('extract_metadata_action');
