@@ -6,18 +6,20 @@ Once installed and active, this module has the following features:
 
 - When adding a media, the module will automatically:
     - Extract metadata from the file and save the metadata alongside the media
-    - Map metadata to media values (see [Metadata crosswalk](#metadata-crosswalk))
+    - Map metadata to resource values
 - When editing a media or batch editing media, the user can choose to:
     - Refresh the extracted metadata
-    - Map metadata to media values (see [Metadata crosswalk](#metadata-crosswalk))
+    - Map metadata to resource values
 - When editing an item or batch editing items, the user can choose to:
     - Refresh extracted metadata of child media
-    - Map metadata to child media values (see [Metadata crosswalk](#metadata-crosswalk))
+    - Map metadata to resource values
 - The user can view the module configuration page to see:
-    - The list of extractors and whether they are available on their system
-    - The metadata crosswalk (if defined)
+    - The list of extractors and whether each is available on your system
+    - The list of mappers
 
 ## Extractors:
+
+Extractors extract metadata from files.
 
 ### ExifTool
 
@@ -43,11 +45,16 @@ under `[extract_metadata_extractor_config][tika][jar_path]`.
 
 ### [More can be added]
 
-## Metadata crosswalk
+## Mappers
 
-This module adds the ability to map individual pieces of metadata to media and item
-values. To enable this feature, you must define your own metadata crosswalk in
-`config/crosswalk.config.php`.
+Mappers map extracted metadata to resource values.
+
+### JSON Pointer
+
+Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
+You must define your own metadata crosswalk in `config/json_pointer_crosswalk.php`.
+
+### [More can be added]
 
 # Copyright
 

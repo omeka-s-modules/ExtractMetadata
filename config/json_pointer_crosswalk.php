@@ -1,9 +1,9 @@
 <?php
 /**
- * The metadata crosswalk.
+ * The JSON Pointer metadata crosswalk.
  *
- * To define the crosswalk, you must provide an array of mapping arrays. Every
- * mapping array must include these keys:
+ * To define the crosswalk, you must provide an array of mapping arrays at the
+ * bottom of this file. Every mapping array must include these keys:
  *
  *   - resource  (string) The resource to map to (media|item)
  *   - extractor (string) The extractor that extracted the metadata (exiftool, exit, etc.)
