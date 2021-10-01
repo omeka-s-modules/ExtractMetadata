@@ -56,19 +56,5 @@
  */
 return [
     'extract_metadata_crosswalk' => [
-        [
-            'resource' => 'media',
-            'extractor' => 'exiftool',
-            'pointer' => '/IPTC/By-line',
-            'term' => 'dcterms:creator',
-            'replace' => false,
-        ],
-        [
-            'resource' => 'media',
-            'extractor' => 'getid3',
-            'pointer' => '/jpg/exif/IFD0/ImageDescription',
-            'term' => 'dcterms:creator',
-            'replace' => false,
-        ],
     ],
 ];
