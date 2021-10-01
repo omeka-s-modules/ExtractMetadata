@@ -328,66 +328,60 @@ SQL;
     {
         $config = $this->getServiceLocator()->get('Config');
         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-        $crosswalk = $config['extract_metadata_crosswalk'];
         $itemEntity = $mediaEntity->getItem();
         $mediaValues = $mediaEntity->getValues();
         $itemValues = $itemEntity->getValues();
         $propertiesToClear = ['media' => [], 'item' =>[]];
         $valuesToAdd = ['media' => [], 'item' => []];
-        foreach ($metadataEntities as $metadataEntity) {
-            $extractor =  $metadataEntity->getExtractor();
-            if (!isset($crosswalk[$extractor])) {
-                // This extractor has no mappings.
+        foreach ($config['extract_metadata_crosswalk'] as $map) {
+            if (!isset($map['resource'], $map['extractor'], $map['pointer'], $map['term'], $map['replace'])) {
+                // All keys are required.
                 continue;
             }
-            foreach ($crosswalk[$extractor] as $map) {
-                if (!isset($map['media'], $map['item'], $map['pointer'], $map['term'], $map['replace'])) {
-                    // All keys are required.
-                    continue;
-                }
-                $property = $this->getPropertyByTerm($map['term']);
-                if (!$property) {
-                    // This term has no property.
-                    continue;
-                }
+            if (!in_array($map['resource'], ['media', 'item'])) {
+                // This resource is invalid.
+                continue;
+            }
+            $metadataEntity = current(array_filter($metadataEntities, function ($metadataEntity) use ($map) {
+                return $map['extractor'] === $metadataEntity->getExtractor();
+            }));
+            if (!$metadataEntity) {
+                // This extractor has no metadata entity.
+                continue;
+            }
+            $property = $this->getPropertyByTerm($map['term']);
+            if (!$property) {
+                // This term has no property.
+                continue;
+            }
+            try {
+                $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
+                $valueString = $jsonPointer->get($map['pointer']);
+            } catch (\Exception $e) {
+                // Invalid JSON, invalid pointer, or nonexistent value.
+                continue;
+            }
+            if (!is_string($valueString)) {
+                // The pointer did not resolve to a string.
+                continue;
+            }
+            $value = new Entity\Value;
+            $value->setType('literal');
+            $value->setProperty($property);
+            $value->setValue($valueString);
+            $value->setIsPublic(true);
+            if ('media' === $map['resource']) {
+                $value->setResource($mediaEntity);
+                $valuesToAdd['media'][] = $value;
                 if ($map['replace']) {
-                    // Set properties to clear if configured to do so.
-                    if ($map['media']) {
-                        $propertiesToClear['media'][] = $property;
-                    }
-                    if ($map['item']) {
-                        $propertiesToClear['item'][] = $property;
-                    }
+                    $propertiesToClear['media'][] = $property;
                 }
-                try {
-                    $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
-                    $valueString = $jsonPointer->get($map['pointer']);
-                } catch (\Exception $e) {
-                    // Invalid JSON, invalid pointer, or nonexistent value.
-                    continue;
-                }
-                if (!is_string($valueString)) {
-                    // The pointer did not resolve to a string.
-                    continue;
-                }
-                // Create and add the value.
-                if ($map['media']) {
-                    $value = new Entity\Value;
-                    $value->setResource($mediaEntity);
-                    $value->setType('literal');
-                    $value->setProperty($property);
-                    $value->setValue($valueString);
-                    $value->setIsPublic(true);
-                    $valuesToAdd['media'][] = $value;
-                }
-                if ($map['item']) {
-                    $value = new Entity\Value;
-                    $value->setResource($itemEntity);
-                    $value->setType('literal');
-                    $value->setProperty($property);
-                    $value->setValue($valueString);
-                    $value->setIsPublic(true);
-                    $valuesToAdd['item'][] = $value;
+            }
+            if ('item' === $map['resource']) {
+                $value->setResource($itemEntity);
+                $valuesToAdd['item'][] = $value;
+                if ($map['replace']) {
+                    $propertiesToClear['item'][] = $property;
                 }
             }
         }

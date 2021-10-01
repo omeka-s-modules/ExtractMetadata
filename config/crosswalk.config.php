@@ -2,14 +2,14 @@
 /**
  * The metadata crosswalk.
  *
- * To define the crosswalk, you must provide an array of mapping arrays, keyed
- * by metadata type. Every mapping array must include these keys:
+ * To define the crosswalk, you must provide an array of mapping arrays. Every
+ * mapping array must include these keys:
  *
- *   - media   (bool)   Whether to map metadata to media values
- *   - item    (bool)   Whether to map metadata to item values
- *   - pointer (string) The JSON pointer to a string in the extracted metadata
- *   - term    (string) The property term (vocabPrefix:propertyLocalName)
- *   - replace (bool)   Replace existing values: true; add to existing values: false
+ *   - resource  (string) The resource to map to (media|item)
+ *   - extractor (string) The extractor that extracted the metadata (exiftool, exit, etc.)
+ *   - pointer   (string) The JSON pointer that resolves to a string in the extracted metadata
+ *   - term      (string) The property term (vocabPrefix:propertyLocalName)
+ *   - replace   (bool)   Replace existing values (true); add to existing values (false)
  *
  * Note that the "pointer" must be formatted using a JSON pointer as defined by
  * https://datatracker.ietf.org/doc/html/rfc6901
@@ -17,30 +17,33 @@
  * For example:
  *
  * 'extract_metadata_crosswalk' => [
- *     'exiftool' => [
- *         [
- *             'media' => false,
- *             'item' => true,
- *             'pointer' => '/IPTC/By-line',
- *             'term' => 'dcterms:creator',
- *             'replace' => false,
- *         ],
- *         [
- *             'media' => true,
- *             'item' => true,
- *             'pointer' => '/EXIF/Copyright',
- *             'term' => 'dcterms:rights',
- *             'replace' => true,
- *         ],
+ *     [
+ *         'resource' => 'item',
+ *         'extractor' => 'exiftool',
+ *         'pointer' => '/IPTC/By-line',
+ *         'term' => 'dcterms:creator',
+ *         'replace' => false,
  *     ],
- *     'getid3' => [
- *         [
- *             'media' => true,
- *             'item' => false,
- *             'pointer' => '/jpg/exif/IFD0/ImageDescription',
- *             'term' => 'dcterms:description',
- *             'replace' => false,
- *         ],
+ *     [
+ *         'resource' => 'media',
+ *         'extractor' => 'exiftool',
+ *         'pointer' => '/EXIF/Copyright',
+ *         'term' => 'dcterms:rights',
+ *         'replace' => true,
+ *     ],
+ *     [
+ *         'resource' => 'item',
+ *         'extractor' => 'exiftool',
+ *         'pointer' => '/EXIF/Copyright',
+ *         'term' => 'dcterms:rights',
+ *         'replace' => true,
+ *     ],
+ *     [
+ *         'resource' => 'media',
+ *         'extractor' => 'getid3',
+ *         'pointer' => '/jpg/exif/IFD0/ImageDescription',
+ *         'term' => 'dcterms:description',
+ *         'replace' => false,
  *     ],
  * ],
  *
@@ -53,5 +56,19 @@
  */
 return [
     'extract_metadata_crosswalk' => [
+        [
+            'resource' => 'media',
+            'extractor' => 'exiftool',
+            'pointer' => '/IPTC/By-line',
+            'term' => 'dcterms:creator',
+            'replace' => false,
+        ],
+        [
+            'resource' => 'media',
+            'extractor' => 'getid3',
+            'pointer' => '/jpg/exif/IFD0/ImageDescription',
+            'term' => 'dcterms:creator',
+            'replace' => false,
+        ],
     ],
 ];
