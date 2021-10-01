@@ -1,6 +1,6 @@
 <?php echo $this->sectionNav([
     'extractors' => $this->translate('Extractors'),
-    'metadata-crosswalk' => $this->translate('Metadata crosswalk'),
+    'mappers' => $this->translate('Mappers'),
 ]); ?>
 <div id="extractors" class="section active">
     <table class="tablesaw tablesaw-stack">
@@ -26,29 +26,22 @@
         </tbody>
     </table>
 </div>
-<div id="metadata-crosswalk" class="section">
-    <?php if ($crosswalk): ?>
+<div id="mappers" class="section">
     <table class="tablesaw tablesaw-stack">
         <thead>
             <tr>
-                <th><?php echo $this->translate('Extractor'); ?></th>
-                <th><?php echo $this->translate('Pointer'); ?></th>
-                <th><?php echo $this->translate('Term'); ?></th>
+                <th><?php echo $this->translate('Mapper'); ?></th>
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($crosswalk as $extractorName => $mapData): ?>
-            <?php foreach ($mapData as $pointer => $term): ?>
+        <?php foreach ($mappers->getRegisteredNames() as $mapperName): ?>
+            <?php
+            $mapper = $mappers->get($mapperName);
+            ?>
             <tr>
-                <td><?php echo $extractorName; ?></td>
-                <td><code><?php echo $pointer; ?></code></td>
-                <td><?php echo $term; ?></td>
+                <td><?php echo $mapperName; ?></td>
             </tr>
-            <?php endforeach; ?>
         <?php endforeach; ?>
         </tbody>
     </table>
-    <?php else: ?>
-    <p><?php echo $this->translate('No crosswalk defined.'); ?></p>
-    <?php endif; ?>
 </div>

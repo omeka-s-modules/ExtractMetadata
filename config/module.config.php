@@ -28,6 +28,7 @@ return [
     'service_manager' => [
         'factories' => [
             'ExtractMetadata\ExtractorManager' => Service\Extractor\ManagerFactory::class,
+            'ExtractMetadata\MapperManager' => Service\Mapper\ManagerFactory::class,
         ],
     ],
     'extract_metadata_extractors' => [
@@ -38,6 +39,11 @@ return [
         'invokables' => [
             'exif' => Extractor\Exif::class,
             'getid3' => Extractor\Getid3::class,
+        ],
+    ],
+    'extract_metadata_mappers' => [
+        'factories' => [
+            'jsonPointer' => Service\Mapper\JsonPointerFactory::class,
         ],
     ],
     'extract_metadata_extractor_config' => [

@@ -16,7 +16,7 @@
  *
  * For example:
  *
- * 'extract_metadata_crosswalk' => [
+ * return [
  *     [
  *         'resource' => 'item',
  *         'extractor' => 'exiftool',
@@ -45,7 +45,7 @@
  *         'term' => 'dcterms:description',
  *         'replace' => false,
  *     ],
- * ],
+ * ];
  *
  * Here we're mapping the "By-line" of the ExifTool output to the Dublin Core
  * Creator of the item, replacing any existing Creator values; the "Copyright"
@@ -55,6 +55,32 @@
  * existing Description values.
  */
 return [
-    'extract_metadata_crosswalk' => [
-    ],
+          [
+          'resource' => 'item',
+          'extractor' => 'exiftool',
+          'pointer' => '/IPTC/By-line',
+          'term' => 'dcterms:creator',
+          'replace' => false,
+      ],
+      [
+          'resource' => 'media',
+          'extractor' => 'exiftool',
+          'pointer' => '/EXIF/Copyright',
+          'term' => 'dcterms:rights',
+          'replace' => true,
+      ],
+      [
+          'resource' => 'item',
+          'extractor' => 'exiftool',
+          'pointer' => '/EXIF/Copyright',
+          'term' => 'dcterms:rights',
+          'replace' => true,
+      ],
+      [
+          'resource' => 'media',
+          'extractor' => 'getid3',
+          'pointer' => '/jpg/exif/IFD0/ImageDescription',
+          'term' => 'dcterms:description',
+          'replace' => false,
+      ],
 ];
