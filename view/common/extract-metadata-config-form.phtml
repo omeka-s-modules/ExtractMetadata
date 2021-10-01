@@ -1,13 +1,18 @@
+<?php use Laminas\Form\Element\Checkbox; ?>
+
 <?php echo $this->sectionNav([
     'extractors' => $this->translate('Extractors'),
     'mappers' => $this->translate('Mappers'),
 ]); ?>
+
 <div id="extractors" class="section active">
+    <p><?php echo $this->translate('Select which extractors to enable when extracting metadata from files.'); ?></p>
     <table class="tablesaw tablesaw-stack">
         <thead>
             <tr>
                 <th><?php echo $this->translate('Extractor'); ?></th>
                 <th><?php echo $this->translate('Available'); ?></th>
+                <th><?php echo $this->translate('Enabled'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -17,29 +22,42 @@
             $isAvailable = $extractor->isAvailable()
                 ? sprintf('<span style="color: green;">%s</span>', $this->translate('Yes'))
                 : sprintf('<span style="color: red;">%s</span>', $this->translate('No'));
+            $checkbox = new Checkbox('enabled_extractors[]');
+            $checkbox->setCheckedValue($extractorName)
+                ->setChecked(in_array($extractorName, $enabledExtractors))
+                ->setUseHiddenElement(false);
             ?>
             <tr>
                 <td><?php echo $extractorName; ?></td>
                 <td><?php echo $isAvailable; ?></td>
+                <td><?php echo $this->formElement($checkbox); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
 </div>
+
 <div id="mappers" class="section">
+    <p><?php echo $this->translate('Select which mappers to enable when mapping metadata to resource values.'); ?></p>
     <table class="tablesaw tablesaw-stack">
         <thead>
             <tr>
                 <th><?php echo $this->translate('Mapper'); ?></th>
+                <th><?php echo $this->translate('Enabled'); ?></th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($mappers->getRegisteredNames() as $mapperName): ?>
             <?php
             $mapper = $mappers->get($mapperName);
+            $checkbox = new Checkbox('enabled_mappers[]');
+            $checkbox->setCheckedValue($mapperName)
+                ->setChecked(in_array($mapperName, $enabledMappers))
+                ->setUseHiddenElement(false);
             ?>
             <tr>
                 <td><?php echo $mapperName; ?></td>
+                <td><?php echo $this->formElement($checkbox); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

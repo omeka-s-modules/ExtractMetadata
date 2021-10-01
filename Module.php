@@ -7,6 +7,7 @@ use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Form\Element;
 use Laminas\ModuleManager\ModuleManager;
+use Laminas\Mvc\Controller\AbstractController;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Entity;
@@ -56,10 +57,22 @@ SQL;
         $services = $this->getServiceLocator();
         $extractors = $services->get('ExtractMetadata\ExtractorManager');
         $mappers = $services->get('ExtractMetadata\MapperManager');
+        $settings = $services->get('Omeka\Settings');
         return $view->partial('common/extract-metadata-config-form', [
             'extractors' => $extractors,
             'mappers' => $mappers,
+            'enabledExtractors' => $settings->get('extract_metadata_enabled_extractors', []),
+            'enabledMappers' => $settings->get('extract_metadata_enabled_mappers', []),
         ]);
+    }
+
+    public function handleConfigForm(AbstractController $controller)
+    {
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        $formData = $controller->params()->fromPost();
+        $settings->set('extract_metadata_enabled_extractors', $formData['enabled_extractors'] ?? []);
+        $settings->set('extract_metadata_enabled_mappers', $formData['enabled_mappers'] ?? []);
+        return true;
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
@@ -264,10 +277,17 @@ SQL;
             // The file doesn't exist.
             return;
         }
-        $extractors = $this->getServiceLocator()->get('ExtractMetadata\ExtractorManager');
-        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $extractors = $services->get('ExtractMetadata\ExtractorManager');
+        $entityManager = $services->get('Omeka\EntityManager');
+        $enabledExtractors = $settings->get('extract_metadata_enabled_extractors', []);
         $metadataEntities = [];
         foreach ($extractors->getRegisteredNames() as $extractorName) {
+            if (!in_array($extractorName, $enabledExtractors)) {
+                // The extractor is not enabled.
+                continue;
+            }
             $extractor = $extractors->get($extractorName);
             if (!$extractor->isAvailable()) {
                 // The extractor is unavailable.
@@ -317,9 +337,16 @@ SQL;
      */
     public function mapMetadata(Entity\Media $mediaEntity, array $metadataEntities)
     {
-        $mappers = $this->getServiceLocator()->get('ExtractMetadata\MapperManager');
+        $services =$this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $mappers = $services->get('ExtractMetadata\MapperManager');
+        $enabledMappers = $settings->get('extract_metadata_enabled_mappers', []);
         // Iterate over every registered mapper.
         foreach ($mappers->getRegisteredNames() as $mapperName) {
+            if (!in_array($mapperName, $enabledMappers)) {
+                // The mapper is not enabled.
+                continue;
+            }
             $mapper = $mappers->get($mapperName);
             $mapper->map($mediaEntity, $metadataEntities);
         }

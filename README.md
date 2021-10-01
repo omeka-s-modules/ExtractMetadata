@@ -4,22 +4,19 @@ Extract embedded metadata from files.
 
 Once installed and active, this module has the following features:
 
-- When adding a media, the module will automatically:
-    - Extract metadata from the file and save the metadata alongside the media
-    - Map metadata to resource values
-- When editing a media or batch editing media, the user can choose to:
-    - Refresh the extracted metadata
-    - Map metadata to resource values
-- When editing an item or batch editing items, the user can choose to:
-    - Refresh extracted metadata of child media
-    - Map metadata to resource values
-- The user can view the module configuration page to see:
-    - The list of extractors and whether each is available on your system
-    - The list of mappers
+- The user can enable/diable extractors and mappers on the module configuration page.
+- When adding a media, the module will automatically extract metadata from the file,
+  save the metadata alongside the media, and map metadata to resource values.
+- When editing a media or batch editing media, the user can choose to refresh the
+  extracted metadata and/or map metadata to resource values.
+- When editing an item or batch editing items, the user can choose to refresh extracted
+  metadata of child media and/or map metadata to resource values.
 
 ## Extractors:
 
-Extractors extract metadata from files.
+Extractors extract metadata from files.  Note that extractors must be enabled on
+the module configuration page.This module comes with four extractors, but more can
+be added depending on your need.
 
 ### ExifTool
 
@@ -43,18 +40,18 @@ Used to extract many types of metadata from many types of files. Requires the
 and the path to the `tika-app-*.jar` file must be configured in `module.config.php`
 under `[extract_metadata_extractor_config][tika][jar_path]`.
 
-### [More can be added]
+### [custom extractors can be added]
 
 ## Mappers
 
-Mappers map extracted metadata to resource values.
+Mappers map extracted metadata to resource values. Note that mappers must be enabled
+on the module configuration page. This module comes with one mapper, but more can
+be added depending on your need.
 
 ### JSON Pointer
 
 Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
 You must define your own metadata crosswalk in `config/json_pointer_crosswalk.php`.
-
-### [More can be added]
 
 # Copyright
 
