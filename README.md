@@ -1,8 +1,7 @@
 # Extract Metadata
 
-Extract embedded metadata from files.
-
-Once installed and active, this module has the following features:
+Extract embedded metadata from files. Once installed and active, this module has
+the following features:
 
 - The user can enable/diable extractors and mappers on the module configuration page.
 - When adding a media, the module will automatically extract metadata from the file,
@@ -39,8 +38,6 @@ Used to extract many types of metadata from many types of files. Requires the
 [Apache Tika](https://tika.apache.org/) content analysis toolkit. Java must be installed
 and the path to the `tika-app-*.jar` file must be configured in `module.config.php`
 under `[extract_metadata_extractor_config][tika][jar_path]`.
-
-### [custom extractors can be added]
 
 ## Mappers
 
