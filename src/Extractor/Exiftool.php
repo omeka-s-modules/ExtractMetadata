@@ -22,7 +22,7 @@ class Exiftool implements ExtractorInterface
         return (bool) $this->cli->getCommandPath('exiftool');
     }
 
-    public function canExtract($mediaType)
+    public function supports($mediaType)
     {
         // exiftool can extract from an unspecified amount of media types.
         return true;

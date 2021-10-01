@@ -13,7 +13,7 @@ class Exif implements ExtractorInterface
         return extension_loaded('exif');
     }
 
-    public function canExtract($mediaType)
+    public function supports($mediaType)
     {
         return in_array($mediaType, [
             'image/jpeg',

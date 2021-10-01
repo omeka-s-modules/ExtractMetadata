@@ -273,7 +273,7 @@ SQL;
                 // The extractor is unavailable.
                 continue;
             }
-            if (!$extractor->canExtract($mediaType)) {
+            if (!$extractor->supports($mediaType)) {
                 // The extractor does not support this media type.
                 continue;
             }

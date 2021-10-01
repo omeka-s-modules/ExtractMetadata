@@ -13,7 +13,7 @@ class Getid3 implements ExtractorInterface
         return true;
     }
 
-    public function canExtract($mediaType)
+    public function supports($mediaType)
     {
         $getid3 = new \getID3;
         // GetFileFormatArray() returns supported file formats.

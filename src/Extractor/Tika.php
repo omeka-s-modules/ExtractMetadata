@@ -27,7 +27,7 @@ class Tika implements ExtractorInterface
         return ($hasJava && $hasTika);
     }
 
-    public function canExtract($mediaType)
+    public function supports($mediaType)
     {
         // tika can extract from an unspecified amount of media types.
         return true;

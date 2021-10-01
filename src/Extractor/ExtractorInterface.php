@@ -14,12 +14,12 @@ interface ExtractorInterface
     public function isAvailable();
 
     /**
-     * Can this extractor extract from this media type?
+     * Does this extractor support this media type?
      *
      * @param string
      * @return bool
      */
-    public function canExtract($mediaType);
+    public function supports($mediaType);
 
     /**
      * Extract metadata from a file and return them as an array.
