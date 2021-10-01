@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 21:55-0400\n"
+"POT-Creation-Date: 2021-10-01 16:51-0400\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
 "Last-Translator: Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2021\n"
 "Language-Team: Catalan (https://www.transifex.com/omeka/teams/14184/ca/)\n"
@@ -21,33 +21,42 @@ msgstr ""
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: Module.php:201
+#: Module.php:209
 msgid "Extract metadata"
 msgstr "Extreu les metadades"
 
-#: view/common/extract-metadata-config-form.phtml:2
+#: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractors"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:3
-msgid "Metadata crosswalk"
+#: view/common/extract-metadata-config-form.phtml:5
+msgid "Mappers"
 msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:9
-#: view/common/extract-metadata-config-form.phtml:34
+msgid "Select which extractors to enable when extracting metadata from files."
+msgstr ""
+
+#: view/common/extract-metadata-config-form.phtml:13
 msgid "Extractor"
 msgstr "Extractor"
 
-#: view/common/extract-metadata-config-form.phtml:10
+#: view/common/extract-metadata-config-form.phtml:14
 msgid "Available"
 msgstr "Disponible"
 
-#: view/common/extract-metadata-config-form.phtml:35
-msgid "Pointer"
+#: view/common/extract-metadata-config-form.phtml:15
+#: view/common/extract-metadata-config-form.phtml:46
+msgid "Enabled"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:52
-msgid "No crosswalk defined."
+#: view/common/extract-metadata-config-form.phtml:41
+msgid ""
+"Select which mappers to enable when mapping metadata to resource values."
+msgstr ""
+
+#: view/common/extract-metadata-config-form.phtml:45
+msgid "Mapper"
 msgstr ""
 
 #: view/common/extract-metadata-section.phtml:8
@@ -60,21 +69,17 @@ msgid "Refresh metadata"
 msgstr "Actualitza les metadades"
 
 #: Module.php:21
-msgid "Refresh and map metadata (add values)"
+msgid "Refresh and map metadata"
 msgstr ""
 
 #: Module.php:22
-msgid "Refresh and map metadata (replace values)"
+msgid "Map metadata"
 msgstr ""
 
 #: Module.php:23
-msgid "Map metadata (add values)"
+msgid "Delete metadata"
 msgstr ""
 
-#: Module.php:24
-msgid "Map metadata (replace values)"
-msgstr ""
-
-#: Module.php:452
+#: Module.php:431
 msgid "[No action]"
 msgstr "[Sense accions]"
