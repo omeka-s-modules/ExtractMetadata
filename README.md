@@ -3,23 +3,25 @@
 Extract embedded metadata from files. Once installed and active, this module has
 the following features:
 
-- The user can enable/diable extractors and mappers on the module configuration page.
-- When adding a media, the module will automatically extract metadata from the file,
-  save the metadata alongside the media, and map metadata to resource values.
-- When editing a media or batch editing media, the user can choose to refresh the
-  extracted metadata and/or map metadata to resource values, as well as delete the
-  extracted metadata.
-- When editing an item or batch editing items, the user can choose to refresh extracted
-  metadata of child media and/or map metadata to resource values, as well as delete
-  the extracted metadata.
+- When configuring the module, the user can enable/diable extractors and mappers.
+- When adding a media, the module will automatically:
+    - Extract metadata from the file;
+    - Save the metadata alongside the media;
+    - Map metadata to resource values.
+- When editing a media/item or batch editing media/item, the user can choose to
+  perform a number of actions:
+    - Refresh metadata: (re)extract metadata from files;
+    - Refresh and map metadata: (re)extract metadata from files and map metadata to resource values;
+    - Map metadata: Map extracted metadata to resource values;
+    - Delete metadata: Delete extracted metadata.
 
 ## Extractors:
 
-Extractors extract metadata from files.  Note that extractors must be enabled on
-the module configuration page.This module comes with four extractors, but more can
-be added depending on your need.
+Extractors extract metadata from files. Note that extractors must be enabled on
+the module configuration page. This module comes with four extractors, but more
+can be added depending on your need.
 
-### ExifTool
+### exiftool
 
 Used to extract many types of metadata from many types of files. Requires the
 [ExifTool](https://exiftool.org/) command-line application.
@@ -29,12 +31,12 @@ Used to extract many types of metadata from many types of files. Requires the
 Used to extract EXIF metadata that is commonly found in JPEG and TIFF files. Requires
 PHP's [exif](https://www.php.net/manual/en/book.exif.php) extension.
 
-### getID3
+### getid3
 
 Used to extract many types of metadata from many types of files. Uses the
 [getID3](https://github.com/JamesHeinrich/getID3) PHP library.
 
-### Tika
+### tika
 
 Used to extract many types of metadata from many types of files. Requires the
 [Apache Tika](https://tika.apache.org/) content analysis toolkit. Java must be installed
@@ -47,7 +49,7 @@ Mappers map extracted metadata to resource values. Note that mappers must be ena
 on the module configuration page. This module comes with one mapper, but more can
 be added depending on your need.
 
-### JSON Pointer
+### jsonPointer
 
 Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
 You must define your own metadata crosswalk in `config/json_pointer_crosswalk.php`.
