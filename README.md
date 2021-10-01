@@ -7,9 +7,11 @@ the following features:
 - When adding a media, the module will automatically extract metadata from the file,
   save the metadata alongside the media, and map metadata to resource values.
 - When editing a media or batch editing media, the user can choose to refresh the
-  extracted metadata and/or map metadata to resource values.
+  extracted metadata and/or map metadata to resource values, as well as delete the
+  extracted metadata.
 - When editing an item or batch editing items, the user can choose to refresh extracted
-  metadata of child media and/or map metadata to resource values.
+  metadata of child media and/or map metadata to resource values, as well as delete
+  the extracted metadata.
 
 ## Extractors:
 

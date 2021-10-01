@@ -20,6 +20,7 @@ class Module extends AbstractModule
         'refresh' => 'Refresh metadata', // @translate
         'refresh_map' => 'Refresh and map metadata', // @translate
         'map' => 'Map metadata', // @translate
+        'delete' => 'Delete metadata', // @translate
     ];
 
     public function init(ModuleManager $moduleManager)
@@ -136,7 +137,7 @@ SQL;
             }
         );
         /*
-         * Add the ExtractMetadata control to the media batch update form.
+         * Add the ExtractMetadata control to the media/item batch update forms.
          */
         $sharedEventManager->attach(
             'Omeka\Form\ResourceBatchUpdateForm',
@@ -353,6 +354,20 @@ SQL;
     }
 
     /**
+     * Delete metadata.
+     *
+     * @param Entity\Media $mediaEntity
+     */
+    public function deleteMetadata(Entity\Media $mediaEntity)
+    {
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $metadataEntities = $this->getMetadataEntities($mediaEntity);
+        foreach ($metadataEntities as $metadataEntity) {
+            $entityManager->remove($metadataEntity);
+        }
+    }
+
+    /**
      * Perform an extract metadata action.
      *
      * @param Entity\Media $mediaEntity
@@ -383,11 +398,11 @@ SQL;
                 }
                 break;
             case 'map':
-                $metadataEntities = $this->getServiceLocator()
-                    ->get('Omeka\EntityManager')
-                    ->getRepository(ExtractMetadata::class)
-                    ->findBy(['media' => $mediaEntity]);
+                $metadataEntities = $this->getMetadataEntities($mediaEntity);
                 $this->mapMetadata($mediaEntity, $metadataEntities);
+                break;
+            case 'delete':
+                $this->deleteMetadata($mediaEntity);
                 break;
         }
     }
@@ -401,6 +416,7 @@ SQL;
     {
         $valueOptions = [
             'map' => self::ACTIONS['map'],
+            'delete' => self::ACTIONS['delete'],
         ];
         $store = $this->getServiceLocator()->get('Omeka\File\Store');
         if ($store instanceof Local) {
@@ -415,5 +431,19 @@ SQL;
         $element->setEmptyOption('[No action]'); // @translate
         $element->setValueOptions($valueOptions);
         return $element;
+    }
+
+    /**
+     * Get all metadata entities for a media.
+     *
+     * @param Entity\Media $mediaEntity
+     * @return array
+     */
+    public function getMetadataEntities(Entity\Media $mediaEntity)
+    {
+        return $this->getServiceLocator()
+            ->get('Omeka\EntityManager')
+            ->getRepository(ExtractMetadata::class)
+            ->findBy(['media' => $mediaEntity]);
     }
 }
