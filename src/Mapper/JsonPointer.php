@@ -8,8 +8,8 @@ use Rs\Json\Pointer;
 /**
  * Map metadata to media/item values using JSON pointer.
  *
- * @see https://datatracker.ietf.org/doc/html/rfc6901
- * @see https://github.com/raphaelstolt/php-jsonpointer
+ * @see https://datatracker.ietf.org/doc/html/rfc6901 For format specification
+ * @see https://github.com/raphaelstolt/php-jsonpointer For PHP implementation
  */
 class JsonPointer implements MapperInterface
 {
