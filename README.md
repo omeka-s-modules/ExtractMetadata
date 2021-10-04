@@ -3,7 +3,10 @@
 Extract embedded metadata from files. Once installed and active, this module has
 the following features:
 
-- When configuring the module, the user can enable/diable extractors and mappers.
+- When configuring the module, the user can:
+    - View and enable/diable extractors;
+    - View and enable/diable mappers;
+    - View the metadata crosswalk for the JSON Pointer mapper (if defined).
 - When adding a media, the module will automatically:
     - Extract metadata from the file;
     - Save the metadata alongside the media;
