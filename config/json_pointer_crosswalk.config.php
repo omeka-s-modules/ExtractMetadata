@@ -17,33 +17,35 @@
  * For example:
  *
  * return [
- *     [
- *         'resource' => 'item',
- *         'extractor' => 'exiftool',
- *         'pointer' => '/IPTC/By-line',
- *         'term' => 'dcterms:creator',
- *         'replace' => false,
- *     ],
- *     [
- *         'resource' => 'media',
- *         'extractor' => 'exiftool',
- *         'pointer' => '/EXIF/Copyright',
- *         'term' => 'dcterms:rights',
- *         'replace' => true,
- *     ],
- *     [
- *         'resource' => 'item',
- *         'extractor' => 'exiftool',
- *         'pointer' => '/EXIF/Copyright',
- *         'term' => 'dcterms:rights',
- *         'replace' => true,
- *     ],
- *     [
- *         'resource' => 'media',
- *         'extractor' => 'getid3',
- *         'pointer' => '/jpg/exif/IFD0/ImageDescription',
- *         'term' => 'dcterms:description',
- *         'replace' => false,
+ *     'extract_metadata_json_pointer_config' => [
+ *         [
+ *             'resource' => 'item',
+ *             'extractor' => 'exiftool',
+ *             'pointer' => '/IPTC/By-line',
+ *             'term' => 'dcterms:creator',
+ *             'replace' => false,
+ *         ],
+ *         [
+ *             'resource' => 'media',
+ *             'extractor' => 'exiftool',
+ *             'pointer' => '/EXIF/Copyright',
+ *             'term' => 'dcterms:rights',
+ *             'replace' => true,
+ *         ],
+ *         [
+ *             'resource' => 'item',
+ *             'extractor' => 'exiftool',
+ *             'pointer' => '/EXIF/Copyright',
+ *             'term' => 'dcterms:rights',
+ *             'replace' => true,
+ *         ],
+ *         [
+ *             'resource' => 'media',
+ *             'extractor' => 'getid3',
+ *             'pointer' => '/jpg/exif/IFD0/ImageDescription',
+ *             'term' => 'dcterms:description',
+ *             'replace' => false,
+ *         ],
  *     ],
  * ];
  *
@@ -54,4 +56,7 @@
  * getID3 output to the Dublin Core Description of the media, adding to any
  * existing Description values.
  */
-return [];
+return [
+    'extract_metadata_json_pointer_crosswalk' => [
+    ],
+];

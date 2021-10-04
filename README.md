@@ -40,7 +40,7 @@ Used to extract many types of metadata from many types of files. Uses the
 
 Used to extract many types of metadata from many types of files. Requires the
 [Apache Tika](https://tika.apache.org/) content analysis toolkit. Java must be installed
-and the path to the `tika-app-*.jar` file must be configured in `module.config.php`
+and the path to the `tika-app-*.jar` file must be configured in `config/module.config.php`
 under `[extract_metadata_extractor_config][tika][jar_path]`.
 
 ## Mappers
@@ -52,7 +52,8 @@ be added depending on your need.
 ### jsonPointer
 
 Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
-You must define your own metadata crosswalk in `config/json_pointer_crosswalk.php`.
+You must define your own metadata crosswalk in `config/json_pointer_crosswalk.config.php` under
+`[extract_metadata_json_pointer_crosswalk]`.
 
 # Copyright
 

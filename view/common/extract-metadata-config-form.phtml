@@ -3,6 +3,7 @@
 <?php echo $this->sectionNav([
     'extractors' => $this->translate('Extractors'),
     'mappers' => $this->translate('Mappers'),
+    'json-pointer' => $this->translate('JSON Pointer'),
 ]); ?>
 
 <div id="extractors" class="section active">
@@ -62,4 +63,62 @@
         <?php endforeach; ?>
         </tbody>
     </table>
+</div>
+
+<div id="json-pointer" class="section">
+    <p><?php echo $this->translate('The metadata crosswalk for the JSON Pointer mapper. Invalid mappings will be marked as [invalid].'); ?></p>
+    <?php if ($jsonPointerCrosswalk): ?>
+    <table class="tablesaw tablesaw-stack">
+        <thead>
+            <tr>
+                <th><?php echo $this->translate('Resource'); ?></th>
+                <th><?php echo $this->translate('Extractor'); ?></th>
+                <th><?php echo $this->translate('Pointer'); ?></th>
+                <th><?php echo $this->translate('Term'); ?></th>
+                <th><?php echo $this->translate('Replace'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($jsonPointerCrosswalk as $map): ?>
+            <?php
+            $errorMessage = sprintf('<span style="color: red;">%s</span>', $this->translate('[invalid]'));
+            // Validate resource.
+            $resource = $map['resource'] ?? null;
+            if (!in_array($resource, ['media', 'item'])) {
+                $resource = sprintf('%s %s', $resource, $errorMessage);
+            }
+            // Validate extractor.
+            $extractor = $map['extractor'] ?? null;
+            try {
+                $this->extractMetadata()->getExtractor($extractor);
+            } catch (\Exception $e) {
+                $extractor = sprintf('%s %s', $extractor, $errorMessage);
+            }
+            // Validate pointer.
+            $pointer = $map['pointer'] ?? null;
+            if (!$pointer) {
+                $pointer = sprintf('%s %s', $pointer, $errorMessage);
+            }
+            // Validate term.
+            $term = $map['term'] ?? null;
+            if (!$jsonPointerMapper->getPropertyByTerm($term)) {
+                $term = sprintf('%s %s', $term, $errorMessage);
+            }
+            // Validate replace.
+            $replace = $map['replace'] ?? null;
+            $replace = $replace ? $this->translate('yes') : $this->translate('no');
+            ?>
+            <tr>
+                <td><?php echo $resource; ?></td>
+                <td><?php echo $extractor; ?></td>
+                <td><?php echo $pointer; ?></td>
+                <td><?php echo $term; ?></td>
+                <td><?php echo $replace; ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p><?php echo $this->translate('No crosswalk is defined. You may define the crosswalk in <code>config/json_pointer_crosswalk.config.php</code>.'); ?></p>
+    <?php endif; ?>
 </div>

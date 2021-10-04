@@ -9,7 +9,8 @@ class JsonPointerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $crosswalk = require sprintf('%s/../../../config/json_pointer_crosswalk.php', __DIR__);
-        return new JsonPointer($crosswalk, $services->get('Omeka\EntityManager'));
+        $config = $services->get('Config');
+        $entityManager = $services->get('Omeka\EntityManager');
+        return new JsonPointer($config['extract_metadata_json_pointer_crosswalk'], $entityManager);
     }
 }
