@@ -8,6 +8,11 @@ namespace ExtractMetadata\Extractor;
  */
 class Getid3 implements ExtractorInterface
 {
+    public function getLabel()
+    {
+        return 'getID3';
+    }
+
     public function isAvailable()
     {
         return true;

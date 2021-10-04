@@ -3,7 +3,7 @@
     <?php echo $this->formRow($element); ?>
     <?php endif; ?>
     <?php foreach ($metadataEntities as $metadataEntity): ?>
-    <h2><?php echo $metadataEntity->getExtractor(); ?></h2>
+    <h2><?php echo $this->extractMetadata()->getExtractor($metadataEntity->getExtractor())->getLabel(); ?></h2>
     <p><?php echo sprintf(
         $this->translate('Last extracted %s.'),
         $this->i18n()->dateFormat($metadataEntity->getExtracted(), 'long', 'long')

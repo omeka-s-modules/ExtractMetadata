@@ -8,6 +8,11 @@ namespace ExtractMetadata\Extractor;
  */
 class Exif implements ExtractorInterface
 {
+    public function getLabel()
+    {
+        return 'Exif';
+    }
+
     public function isAvailable()
     {
         return extension_loaded('exif');

@@ -31,6 +31,11 @@ return [
             'ExtractMetadata\MapperManager' => Service\Mapper\ManagerFactory::class,
         ],
     ],
+    'view_helpers' => [
+        'factories' => [
+            'extractMetadata' => Service\ViewHelper\ExtractMetadataFactory::class,
+        ],
+    ],
     'extract_metadata_extractors' => [
         'factories' => [
             'exiftool' => Service\Extractor\ExiftoolFactory::class,

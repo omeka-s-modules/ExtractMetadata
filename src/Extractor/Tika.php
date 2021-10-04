@@ -20,6 +20,11 @@ class Tika implements ExtractorInterface
         $this->config = $config;
     }
 
+    public function getLabel()
+    {
+        return 'Tika';
+    }
+
     public function isAvailable()
     {
         $hasJava = (bool) $this->cli->getCommandPath('java');

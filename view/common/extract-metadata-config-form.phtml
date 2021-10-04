@@ -28,7 +28,7 @@
                 ->setUseHiddenElement(false);
             ?>
             <tr>
-                <td><?php echo $extractorName; ?></td>
+                <td><?php echo $extractor->getLabel(); ?></td>
                 <td><?php echo $isAvailable; ?></td>
                 <td><?php echo $this->formElement($checkbox); ?></td>
             </tr>
@@ -56,7 +56,7 @@
                 ->setUseHiddenElement(false);
             ?>
             <tr>
-                <td><?php echo $mapperName; ?></td>
+                <td><?php echo $mapper->getLabel(); ?></td>
                 <td><?php echo $this->formElement($checkbox); ?></td>
             </tr>
         <?php endforeach; ?>

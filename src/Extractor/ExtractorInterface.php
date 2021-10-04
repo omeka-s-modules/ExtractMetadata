@@ -7,6 +7,13 @@ namespace ExtractMetadata\Extractor;
 interface ExtractorInterface
 {
     /**
+     * Get the label of this extractor.
+     *
+     * @return string
+     */
+    public function getLabel();
+
+    /**
      * Is this extractor available?
      *
      * @return bool

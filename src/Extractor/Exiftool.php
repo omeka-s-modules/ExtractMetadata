@@ -17,6 +17,11 @@ class Exiftool implements ExtractorInterface
         $this->cli = $cli;
     }
 
+    public function getLabel()
+    {
+        return 'ExifTool';
+    }
+
     public function isAvailable()
     {
         return (bool) $this->cli->getCommandPath('exiftool');

@@ -9,6 +9,13 @@ use Omeka\Entity;
 interface MapperInterface
 {
     /**
+     * Get the label of this mapper.
+     *
+     * @return string
+     */
+    public function getLabel();
+
+    /**
      * Map extracted metadata.
      *
      * @param Entity\Media $mediaEntity

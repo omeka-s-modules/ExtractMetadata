@@ -23,6 +23,11 @@ class JsonPointer implements MapperInterface
         $this->entityManager = $entityManager;
     }
 
+    public function getLabel()
+    {
+        return 'JSON Pointer';
+    }
+
     public function map(Entity\Media $mediaEntity, array $metadataEntities)
     {
         $itemEntity = $mediaEntity->getItem();
