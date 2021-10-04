@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2021
+# Rivo Zängov <eraser@eraser.ee>, 2021
 # 
 #, fuzzy
 msgid ""
@@ -13,17 +13,17 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-04 13:40-0400\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
-"Last-Translator: Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2021\n"
-"Language-Team: Catalan (https://www.transifex.com/omeka/teams/14184/ca/)\n"
+"Last-Translator: Rivo Zängov <eraser@eraser.ee>, 2021\n"
+"Language-Team: Estonian (https://www.transifex.com/omeka/teams/14184/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ca\n"
+"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Module.php:215
 msgid "Extract metadata"
-msgstr "Extreu les metadades"
+msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractors"
@@ -31,7 +31,7 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Mappers"
-msgstr ""
+msgstr "Kaardistaja"
 
 #: view/common/extract-metadata-config-form.phtml:6
 msgid "JSON Pointer"
@@ -44,16 +44,16 @@ msgstr ""
 #: view/common/extract-metadata-config-form.phtml:14
 #: view/common/extract-metadata-config-form.phtml:75
 msgid "Extractor"
-msgstr "Extractor"
+msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:15
 msgid "Available"
-msgstr "Disponible"
+msgstr "Saadaval"
 
 #: view/common/extract-metadata-config-form.phtml:16
 #: view/common/extract-metadata-config-form.phtml:47
 msgid "Enabled"
-msgstr ""
+msgstr "Sisse lülitatud"
 
 #: view/common/extract-metadata-config-form.phtml:42
 msgid ""
@@ -62,7 +62,7 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:46
 msgid "Mapper"
-msgstr ""
+msgstr "Kaardistaja"
 
 #: view/common/extract-metadata-config-form.phtml:69
 msgid ""
@@ -95,20 +95,20 @@ msgstr ""
 
 #: Module.php:20
 msgid "Refresh metadata"
-msgstr "Actualitza les metadades"
+msgstr "Värskenda metaandmeid"
 
 #: Module.php:21
 msgid "Refresh and map metadata"
-msgstr ""
+msgstr "Värskenda ja kaardista metaandmed"
 
 #: Module.php:22
 msgid "Map metadata"
-msgstr ""
+msgstr "Kaardista metaandmed"
 
 #: Module.php:23
 msgid "Delete metadata"
-msgstr ""
+msgstr "Kustuta metaandmed"
 
 #: Module.php:437
 msgid "[No action]"
-msgstr "[Sense accions]"
+msgstr "[Toimingut pole]"
