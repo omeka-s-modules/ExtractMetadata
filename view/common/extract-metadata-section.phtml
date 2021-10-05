@@ -8,6 +8,8 @@
         $this->translate('Last extracted %s.'),
         $this->i18n()->dateFormat($metadataEntity->getExtracted(), 'long', 'long')
     ); ?></p>
-    <textarea style="width: 100%; height: 300px;" disabled><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></textarea>
+    <div>
+        <pre><?php echo json_encode($metadataEntity->getMetadata(), JSON_PRETTY_PRINT); ?></pre>
+    </div>
     <?php endforeach; ?>
 </div>
