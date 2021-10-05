@@ -8,6 +8,7 @@ use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Form\Element;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\Controller\AbstractController;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Entity;
@@ -67,7 +68,7 @@ SQL;
             'extractors' => $extractors,
             'mappers' => $mappers,
             'enabledExtractors' => $settings->get('extract_metadata_enabled_extractors', []),
-            'enabledMappers' => $settings->get('extract_metadata_enabled_mappers', []),
+            'enabledMapper' => $settings->get('extract_metadata_enabled_mapper', null),
             'jsonPointerMapper' => $mappers->get('jsonPointer'),
             'jsonPointerCrosswalk' => $config['extract_metadata_json_pointer_crosswalk'],
         ]);
@@ -78,7 +79,7 @@ SQL;
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
         $formData = $controller->params()->fromPost();
         $settings->set('extract_metadata_enabled_extractors', $formData['enabled_extractors'] ?? []);
-        $settings->set('extract_metadata_enabled_mappers', $formData['enabled_mappers'] ?? []);
+        $settings->set('extract_metadata_enabled_mapper', $formData['enabled_mapper'] ?? null);
         return true;
     }
 
@@ -349,16 +350,14 @@ SQL;
         $services =$this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $mappers = $services->get('ExtractMetadata\MapperManager');
-        $enabledMappers = $settings->get('extract_metadata_enabled_mappers', []);
-        // Iterate over every registered mapper.
-        foreach ($mappers->getRegisteredNames() as $mapperName) {
-            if (!in_array($mapperName, $enabledMappers)) {
-                // The mapper is not enabled.
-                continue;
-            }
-            $mapper = $mappers->get($mapperName);
-            $mapper->map($mediaEntity, $metadataEntities);
+        $enabledMapper = $settings->get('extract_metadata_enabled_mapper', null);
+        try {
+            $mapper = $mappers->get($enabledMapper);
+        } catch (ServiceNotFoundException $e) {
+            // The mapper is not registered.
+            return;
         }
+        $mapper->map($mediaEntity, $metadataEntities);
     }
 
     /**

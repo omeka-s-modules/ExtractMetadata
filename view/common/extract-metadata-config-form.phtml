@@ -49,17 +49,15 @@
             </tr>
         </thead>
         <tbody>
+            <tr>
+                <td><?php echo $this->translate('[no mapper]'); ?></td>
+                <td><input type="radio" name="enabled_mapper" value=""<?php echo !$enabledMapper ? ' checked' : ''; ?>></td>
+            </tr>
         <?php foreach ($mappers->getRegisteredNames() as $mapperName): ?>
-            <?php
-            $mapper = $mappers->get($mapperName);
-            $checkbox = new Checkbox('enabled_mappers[]');
-            $checkbox->setCheckedValue($mapperName)
-                ->setChecked(in_array($mapperName, $enabledMappers))
-                ->setUseHiddenElement(false);
-            ?>
+            <?php $mapper = $mappers->get($mapperName); ?>
             <tr>
                 <td><?php echo $mapper->getLabel(); ?></td>
-                <td><?php echo $this->formElement($checkbox); ?></td>
+                <td><input type="radio" name="enabled_mapper" value="<?php echo $this->escapeHtml($mapperName); ?>"<?php echo ($mapperName === $enabledMapper) ? ' checked' : ''; ?>></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
