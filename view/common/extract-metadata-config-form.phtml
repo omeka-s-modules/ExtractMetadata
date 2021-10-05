@@ -26,7 +26,8 @@
             $checkbox = new Checkbox('enabled_extractors[]');
             $checkbox->setCheckedValue($extractorName)
                 ->setChecked(in_array($extractorName, $enabledExtractors))
-                ->setUseHiddenElement(false);
+                ->setUseHiddenElement(false)
+                ->setAttribute('disabled', !$extractor->isAvailable());
             ?>
             <tr>
                 <td><?php echo $extractor->getLabel(); ?></td>
