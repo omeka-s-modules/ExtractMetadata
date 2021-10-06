@@ -132,11 +132,15 @@ const jsonPointerAdd = $('#json-pointer-add');
 const jsonPointerTable = $('#json-pointer-table');
 const jsonPointerRowTemplate = jsonPointerTable.data('rowTemplate');
 const jsonPointerCrosswalk = jsonPointerTable.data('crosswalk');
+let jsonPointerRowIndex = 0;
 const jsonPointerGetRowCount = function() {
     return jsonPointerTable.find('tbody tr').length;
 };
+const jsonPointerGetRow = function() {
+    return $($.parseHTML(jsonPointerRowTemplate.replaceAll('__INDEX__', jsonPointerRowIndex++)));
+};
 $(jsonPointerCrosswalk).each(function(index, map) {
-    const jsonPointerRow = $($.parseHTML(jsonPointerRowTemplate.replaceAll('__INDEX__', index)));
+    const jsonPointerRow = jsonPointerGetRow();
     jsonPointerTable.find('tbody').append(jsonPointerRow);
     jsonPointerRow.find('.json-pointer-resource').val(map.resource);
     jsonPointerRow.find('.json-pointer-extractor').val(map.extractor);
@@ -148,10 +152,10 @@ if (0 === jsonPointerGetRowCount()) {
     jsonPointerTable.hide();
 }
 jsonPointerAdd.on('click', function(e) {
-    const jsonPointerRow = $($.parseHTML(jsonPointerRowTemplate.replaceAll('__INDEX__', jsonPointerGetRowCount())));
+    const jsonPointerRow = jsonPointerGetRow();
     jsonPointerTable.show();
     jsonPointerTable.find('tbody').append(jsonPointerRow);
-    $(jsonPointerRow).find('.chosen-select').chosen();
+    jsonPointerRow.find('.chosen-select').chosen();
 });
 jsonPointerTable.on('click', '.json-pointer-delete', function(e) {
     e.preventDefault();

@@ -73,9 +73,24 @@ SQL;
     {
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
         $formData = $controller->params()->fromPost();
-        $settings->set('extract_metadata_enabled_extractors', $formData['enabled_extractors'] ?? []);
-        $settings->set('extract_metadata_enabled_mapper', $formData['enabled_mapper'] ?? null);
-        $settings->set('extract_metadata_json_pointer_crosswalk', $formData['json_pointer_crosswalk'] ?? []);
+        // Validate the form data.
+        $enabledExtractors = $formData['enabled_extractors'] ?? [];
+        if (!is_array($enabledExtractors)) {
+            $enabledExtractors = [];
+        }
+        $enabledMapper = $formData['enabled_mapper'] ?? null;
+        if (!is_string($enabledMapper)) {
+            $enabledMapper = null;
+        }
+        $jsonPointerCrosswalk = $formData['json_pointer_crosswalk'] ?? [];
+        if (!is_array($jsonPointerCrosswalk)) {
+            $jsonPointerCrosswalk = [];
+        }
+        // Must reset array keys or jQuery's $.each() will pass incorrect data.
+        $jsonPointerCrosswalk = array_values($jsonPointerCrosswalk);
+        $settings->set('extract_metadata_enabled_extractors', $enabledExtractors);
+        $settings->set('extract_metadata_enabled_mapper', $enabledMapper);
+        $settings->set('extract_metadata_json_pointer_crosswalk', $jsonPointerCrosswalk);
         return true;
     }
 
