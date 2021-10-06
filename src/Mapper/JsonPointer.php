@@ -36,7 +36,7 @@ class JsonPointer implements MapperInterface
         $propertiesToClear = ['media' => [], 'item' =>[]];
         $valuesToAdd = ['media' => [], 'item' => []];
         foreach ($this->crosswalk as $map) {
-            if (!isset($map['resource'], $map['extractor'], $map['pointer'], $map['term'], $map['replace'])) {
+            if (!isset($map['resource'], $map['extractor'], $map['pointer'], $map['property'], $map['replace'])) {
                 // All keys are required.
                 continue;
             }
@@ -51,9 +51,9 @@ class JsonPointer implements MapperInterface
                 // This extractor has no metadata entity.
                 continue;
             }
-            $property = $this->getPropertyByTerm($map['term']);
+            $property = $this->entityManager->find('Omeka\Entity\Property', $map['property']);
             if (!$property) {
-                // This term has no property.
+                // This property does not exist.
                 continue;
             }
             try {
@@ -107,28 +107,5 @@ class JsonPointer implements MapperInterface
         foreach ($valuesToAdd['item'] as $value) {
             $itemValues->add($value);
         }
-    }
-
-    /**
-     * Get property by term.
-     *
-     * @param string $term vocabularyPrefix:propertyLocalName
-     * @return null|Entity\Property
-     */
-    public function getPropertyByTerm($term)
-    {
-        list($prefix, $localName) = array_pad(explode(':', $term), 2, null);
-        $dql = '
-            SELECT p
-            FROM Omeka\Entity\Property p
-            JOIN p.vocabulary v
-            WHERE p.localName = :localName
-            AND v.prefix = :prefix';
-        $query = $this->entityManager->createQuery($dql);
-        $query->setParameters([
-            'localName' => $localName,
-            'prefix' => $prefix,
-        ]);
-        return $query->getOneOrNullResult();
     }
 }

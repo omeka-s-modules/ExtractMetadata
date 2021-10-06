@@ -1,9 +1,9 @@
-<?php use Laminas\Form\Element\Checkbox; ?>
+<?php use Laminas\Form\Element; ?>
 
 <?php echo $this->sectionNav([
     'extractors' => $this->translate('Extractors'),
     'mappers' => $this->translate('Mappers'),
-    'json-pointer' => $this->translate('JSON Pointer'),
+    'json-pointer' => $this->translate('JSON Pointer crosswalk'),
 ]); ?>
 
 <div id="extractors" class="section active">
@@ -23,7 +23,7 @@
             $isAvailable = $extractor->isAvailable()
                 ? sprintf('<span style="color: green;">%s</span>', $this->translate('Yes'))
                 : sprintf('<span style="color: red;">%s</span>', $this->translate('No'));
-            $checkbox = new Checkbox('enabled_extractors[]');
+            $checkbox = new Element\Checkbox('enabled_extractors[]');
             $checkbox->setCheckedValue($extractorName)
                 ->setChecked(in_array($extractorName, $enabledExtractors))
                 ->setUseHiddenElement(false)
@@ -64,60 +64,91 @@
     </table>
 </div>
 
+<?php
+// resource
+$valueOptions = [
+    'media' => $this->translate('Media'),
+    'item' => $this->translate('Item'),
+];
+$resourceSelect = new Element\Select('json_pointer_crosswalk[__INDEX__][resource]');
+$resourceSelect->setValueOptions($valueOptions)->setAttribute('class', 'json-pointer-resource');
+// extractor
+$valueOptions = [];
+foreach ($extractors->getRegisteredNames() as $extractorName) {
+    $extractor = $extractors->get($extractorName);
+    $valueOptions[$extractorName] = $extractor->getLabel();
+}
+$extractorSelect = new Element\Select('json_pointer_crosswalk[__INDEX__][extractor]');
+$extractorSelect->setValueOptions($valueOptions)->setAttribute('class', 'json-pointer-extractor');
+// pointer
+$pointerInput = new Element\Text('json_pointer_crosswalk[__INDEX__][pointer]');
+$pointerInput->setAttribute('class', 'json-pointer-pointer');
+// property
+$propertyInput = $this->propertySelect([
+    'name' => 'json_pointer_crosswalk[__INDEX__][property]',
+    'attributes' => ['class' => 'json-pointer-property chosen-select'],
+]);
+// replace
+$replaceCheckbox = new Element\Checkbox('json_pointer_crosswalk[__INDEX__][replace]');
+$replaceCheckbox->setAttribute('class', 'json-pointer-replace');
+$jsonPointerRowTemplate = <<<TEMPLATE
+<tr>
+    <td>{$this->formElement($resourceSelect)}</td>
+    <td>{$this->formElement($extractorSelect)}</td>
+    <td>{$this->formElement($pointerInput)}</td>
+    <td>$propertyInput</td>
+    <td>{$this->formElement($replaceCheckbox)}</td>
+    <td><a class="json-pointer-delete o-icon-delete" href="#" title="{$this->translate('Delete map')}" aria-label="{$this->translate('Delete map')}"></a></td>
+</tr>
+TEMPLATE;
+?>
+
 <div id="json-pointer" class="section">
-    <p><?php echo $this->translate('The metadata crosswalk for the JSON Pointer mapper. Invalid mappings will be marked as [invalid].'); ?></p>
-    <?php if ($jsonPointerCrosswalk): ?>
-    <table class="tablesaw tablesaw-stack">
+    <p><?php echo sprintf(
+        $this->translate('Define the metadata crosswalk for the JSON Pointer mapper. Note that the "Pointer" must be formatted using a JSON pointer as defined by the %sIETF standard%s.'),
+        '<a href="https://datatracker.ietf.org/doc/html/rfc6901" target="_blank">', '</a>'
+    ); ?></p>
+    <button type="button" id="json-pointer-add" ><?php echo $this->translate('Add map +'); ?></button>
+    <table id="json-pointer-table"
+        class="tablesaw tablesaw-stack"
+        data-row-template="<?php echo $this->escapeHtml($jsonPointerRowTemplate); ?>"
+        data-crosswalk="<?php echo $this->escapeHtml(json_encode($jsonPointerCrosswalk)); ?>">
         <thead>
             <tr>
                 <th><?php echo $this->translate('Resource'); ?></th>
                 <th><?php echo $this->translate('Extractor'); ?></th>
                 <th><?php echo $this->translate('Pointer'); ?></th>
-                <th><?php echo $this->translate('Term'); ?></th>
-                <th><?php echo $this->translate('Replace'); ?></th>
+                <th><?php echo $this->translate('Property'); ?></th>
+                <th><?php echo $this->translate('Replace values?'); ?></th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
-        <?php foreach ($jsonPointerCrosswalk as $map): ?>
-            <?php
-            $errorMessage = sprintf('<span style="color: red;">%s</span>', $this->translate('[invalid]'));
-            // Validate resource.
-            $resource = $map['resource'] ?? null;
-            if (!in_array($resource, ['media', 'item'])) {
-                $resource = sprintf('%s %s', $resource, $errorMessage);
-            }
-            // Validate extractor.
-            $extractor = $map['extractor'] ?? null;
-            try {
-                $this->extractMetadata()->getExtractor($extractor);
-            } catch (\Exception $e) {
-                $extractor = sprintf('%s %s', $extractor, $errorMessage);
-            }
-            // Validate pointer.
-            $pointer = $map['pointer'] ?? null;
-            if (!$pointer) {
-                $pointer = sprintf('%s %s', $pointer, $errorMessage);
-            }
-            // Validate term.
-            $term = $map['term'] ?? null;
-            if (!$jsonPointerMapper->getPropertyByTerm($term)) {
-                $term = sprintf('%s %s', $term, $errorMessage);
-            }
-            // Validate replace.
-            $replace = $map['replace'] ?? null;
-            $replace = $replace ? $this->translate('yes') : $this->translate('no');
-            ?>
-            <tr>
-                <td><?php echo $resource; ?></td>
-                <td><?php echo $extractor; ?></td>
-                <td><?php echo $pointer; ?></td>
-                <td><?php echo $term; ?></td>
-                <td><?php echo $replace; ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
+        <tbody></tbody>
     </table>
-    <?php else: ?>
-    <p><?php echo $this->translate('No crosswalk is defined. You may define the crosswalk in <code>config/json_pointer_crosswalk.config.php</code>.'); ?></p>
-    <?php endif; ?>
 </div>
+
+<script>
+const jsonPointerAdd = $('#json-pointer-add');
+const jsonPointerTable = $('#json-pointer-table');
+const jsonPointerRowTemplate = jsonPointerTable.data('rowTemplate');
+const jsonPointerCrosswalk = jsonPointerTable.data('crosswalk');
+$(jsonPointerCrosswalk).each(function(index, map) {
+    const jsonPointerRow = $($.parseHTML(jsonPointerRowTemplate.replaceAll('__INDEX__', index)));
+    jsonPointerTable.find('tbody').append(jsonPointerRow);
+    jsonPointerRow.find('.json-pointer-resource').val(map.resource);
+    jsonPointerRow.find('.json-pointer-extractor').val(map.extractor);
+    jsonPointerRow.find('.json-pointer-pointer').val(map.pointer);
+    jsonPointerRow.find('.json-pointer-property').val(map.property);
+    jsonPointerRow.find('.json-pointer-replace').prop('checked', 1 == map.replace);
+});
+jsonPointerAdd.on('click', function(e) {
+    const rowCount = jsonPointerTable.find('tbody tr').length;
+    const jsonPointerRow = $($.parseHTML(jsonPointerRowTemplate.replaceAll('__INDEX__', rowCount)));
+    jsonPointerTable.find('tbody').append(jsonPointerRow);
+    $(jsonPointerRow).find('.chosen-select').chosen();
+});
+jsonPointerTable.on('click', '.json-pointer-delete', function(e) {
+    e.preventDefault();
+    $(this).closest('tr').remove();
+});
+</script>

@@ -31,10 +31,7 @@ class Module extends AbstractModule
 
     public function getConfig()
     {
-        return array_merge(
-            include sprintf('%s/config/module.config.php', __DIR__),
-            include sprintf('%s/config/json_pointer_crosswalk.config.php', __DIR__)
-        );
+        return include sprintf('%s/config/module.config.php', __DIR__);
     }
 
     public function install(ServiceLocatorInterface $services)
@@ -63,14 +60,12 @@ SQL;
         $extractors = $services->get('ExtractMetadata\ExtractorManager');
         $mappers = $services->get('ExtractMetadata\MapperManager');
         $settings = $services->get('Omeka\Settings');
-        $config = $services->get('Config');
         return $view->partial('common/extract-metadata-config-form', [
             'extractors' => $extractors,
             'mappers' => $mappers,
             'enabledExtractors' => $settings->get('extract_metadata_enabled_extractors', []),
             'enabledMapper' => $settings->get('extract_metadata_enabled_mapper', null),
-            'jsonPointerMapper' => $mappers->get('jsonPointer'),
-            'jsonPointerCrosswalk' => $config['extract_metadata_json_pointer_crosswalk'],
+            'jsonPointerCrosswalk' => $settings->get('extract_metadata_json_pointer_crosswalk', []),
         ]);
     }
 
@@ -80,6 +75,7 @@ SQL;
         $formData = $controller->params()->fromPost();
         $settings->set('extract_metadata_enabled_extractors', $formData['enabled_extractors'] ?? []);
         $settings->set('extract_metadata_enabled_mapper', $formData['enabled_mapper'] ?? null);
+        $settings->set('extract_metadata_json_pointer_crosswalk', $formData['json_pointer_crosswalk'] ?? []);
         return true;
     }
 

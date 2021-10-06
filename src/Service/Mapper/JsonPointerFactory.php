@@ -9,8 +9,8 @@ class JsonPointerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $config = $services->get('Config');
+        $settings = $services->get('Omeka\Settings');
         $entityManager = $services->get('Omeka\EntityManager');
-        return new JsonPointer($config['extract_metadata_json_pointer_crosswalk'], $entityManager);
+        return new JsonPointer($settings->get('extract_metadata_json_pointer_crosswalk', []), $entityManager);
     }
 }
