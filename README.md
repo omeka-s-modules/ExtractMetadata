@@ -24,22 +24,22 @@ Extractors extract metadata from files. Note that extractors must be enabled on
 the module configuration page. This module comes with four extractors, but more
 can be added depending on your need.
 
-### exiftool
+### ExifTool
 
 Used to extract many types of metadata from many types of files. Requires the
 [ExifTool](https://exiftool.org/) command-line application.
 
-### exif
+### Exif
 
 Used to extract EXIF metadata that is commonly found in JPEG and TIFF files. Requires
 PHP's [exif](https://www.php.net/manual/en/book.exif.php) extension.
 
-### getid3
+### getID3
 
 Used to extract many types of metadata from many types of files. Uses the
 [getID3](https://github.com/JamesHeinrich/getID3) PHP library.
 
-### tika
+### Tika
 
 Used to extract many types of metadata from many types of files. Requires the
 [Apache Tika](https://tika.apache.org/) content analysis toolkit. Java must be installed
@@ -52,11 +52,11 @@ Mappers map extracted metadata to resource values. Note that mappers must be ena
 on the module configuration page. This module comes with one mapper, but more can
 be added depending on your need.
 
-### jsonPointer
+### JSON Pointer
 
 Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
-You must define your own metadata crosswalk in `config/json_pointer_crosswalk.config.php` under
-`[extract_metadata_json_pointer_crosswalk]`.
+You must define your own metadata crosswalk in the module configuration page under
+"JSON Pointer crosswalk".
 
 # Copyright
 
