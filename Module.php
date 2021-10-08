@@ -223,6 +223,15 @@ SQL;
          */
         $viewEditSectionNav = function (Event $event) {
             $view = $event->getTarget();
+            if ('view.show.section_nav' === $event->getName()) {
+                // The media must have metadata to render tab.
+                $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+                $metadataEntities = $entityManager->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $view->media->id()]);
+                if (!$metadataEntities) {
+                    return;
+                }
+            }
             $view->headLink()->appendStylesheet($view->assetUrl('css/admin/extract-metadata.css', 'ExtractMetadata'));
             $sectionNavs = $event->getParam('section_nav');
             $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
@@ -253,7 +262,7 @@ SQL;
             $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
             // Set the form element, if needed.
             $element = null;
-            if ('view.show.after' !== $event->getName()) {
+            if ('view.edit.form.after' === $event->getName()) {
                 $element = $this->getActionSelect();
             }
             // Set the metadata entity, if needed.
@@ -261,6 +270,10 @@ SQL;
             if ($view->media) {
                 $metadataEntities = $entityManager->getRepository(ExtractMetadata::class)
                     ->findBy(['media' => $view->media->id()]);
+            }
+            if (!$element && !$metadataEntities) {
+                // The media must have metadata to render section.
+                return;
             }
             echo $view->partial('common/extract-metadata-section', [
                 'element' => $element,
