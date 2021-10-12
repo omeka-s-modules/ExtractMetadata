@@ -502,18 +502,23 @@ SQL;
      */
     public function getActionSelect()
     {
-        $valueOptions = [
-            'map' => self::ACTIONS['map'],
-            'delete' => self::ACTIONS['delete'],
-        ];
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
         $store = $this->getServiceLocator()->get('Omeka\File\Store');
+        $mapperEnabled = $settings->get('extract_metadata_enabled_mapper');
+        $valueOptions = [];
         if ($store instanceof Local) {
             // Files must be stored locally to refresh extracted metadata.
-            $valueOptions = [
-                'refresh' => self::ACTIONS['refresh'],
-                'refresh_map' => self::ACTIONS['refresh_map'],
-            ] + $valueOptions;
+            $valueOptions['refresh'] = self::ACTIONS['refresh'];
+            if ($mapperEnabled) {
+                // A mapper must be enabled to map metadata.
+                $valueOptions['refresh_map'] = self::ACTIONS['refresh_map'];
+            }
         }
+        if ($mapperEnabled) {
+            // A mapper must be enabled to map metadata.
+            $valueOptions['map'] = self::ACTIONS['map'];
+        }
+        $valueOptions['delete'] = self::ACTIONS['delete'];
         $element = new Element\Select('extract_metadata_action');
         $element->setLabel('Extract metadata');
         $element->setEmptyOption('[No action]'); // @translate
