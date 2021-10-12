@@ -1,7 +1,5 @@
 <div id="extract-metadata" class="section">
-    <?php if ($element): ?>
     <?php echo $this->formRow($element); ?>
-    <?php endif; ?>
     <?php foreach ($metadataEntities as $metadataEntity): ?>
     <div class="extractor">
         <h2><?php echo $this->extractMetadata()->getExtractor($metadataEntity->getExtractor())->getLabel(); ?></h2>

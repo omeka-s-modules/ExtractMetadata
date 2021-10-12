@@ -219,81 +219,138 @@ SQL;
             $preprocessBatchUpdate
         );
         /*
-         * Add an "Extract metadata" tab to the item and media edit pages.
+         * Add an "Extract metadata" tab to the item edit page.
          */
-        $viewEditSectionNav = function (Event $event) {
-            $view = $event->getTarget();
-            if ('view.show.section_nav' === $event->getName()) {
-                // The media must have metadata to render tab.
-                $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-                $metadataEntities = $entityManager->getRepository(ExtractMetadata::class)
-                    ->findBy(['media' => $view->media->id()]);
-                if (!$metadataEntities) {
-                    return;
-                }
-            }
-            $view->headLink()->appendStylesheet($view->assetUrl('css/admin/extract-metadata.css', 'ExtractMetadata'));
-            $sectionNavs = $event->getParam('section_nav');
-            $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
-            $event->setParam('section_nav', $sectionNavs);
-        };
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.edit.section_nav',
-            $viewEditSectionNav
+            function (Event $event) {
+                $view = $event->getTarget();
+                if (!$view->item->media()) {
+                    // The item must have media to render tab.
+                    return;
+                }
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata'
+                ));
+                $sectionNavs = $event->getParam('section_nav');
+                $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
+                $event->setParam('section_nav', $sectionNavs);
+            }
         );
+        /*
+         * Add an "Extract metadata" tab to the media edit page.
+         */
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
             'view.edit.section_nav',
-            $viewEditSectionNav
+            function (Event $event) {
+                $view = $event->getTarget();
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata'
+                ));
+                $sectionNavs = $event->getParam('section_nav');
+                $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
+                $event->setParam('section_nav', $sectionNavs);
+            }
         );
+        /*
+         * Add an "Extract metadata" tab to the media show page.
+         */
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
             'view.show.section_nav',
-            $viewEditSectionNav
+            function (Event $event) {
+                $view = $event->getTarget();
+                $metadataEntities = $this->getServiceLocator()
+                    ->get('Omeka\EntityManager')
+                    ->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $view->media->id()]);
+                if (!$metadataEntities) {
+                    // The media must have metadata to render tab.
+                    return;
+                }
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata'
+                ));
+                $sectionNavs = $event->getParam('section_nav');
+                $sectionNavs['extract-metadata'] = $view->translate('Extract metadata');
+                $event->setParam('section_nav', $sectionNavs);
+            }
         );
         /*
-         * Add an "Extract metadata" section to the item and media edit pages.
+         * Add an "Extract metadata" section to the item edit page.
          */
-        $viewEditFormAfter = function (Event $event) {
-            $view = $event->getTarget();
-            $view->headLink()->appendStylesheet($view->assetUrl('css/admin/extract-metadata.css', 'ExtractMetadata'));
-            $store = $this->getServiceLocator()->get('Omeka\File\Store');
-            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-            // Set the form element, if needed.
-            $element = null;
-            if ('view.edit.form.after' === $event->getName()) {
-                $element = $this->getActionSelect();
-            }
-            // Set the metadata entity, if needed.
-            $metadataEntities = [];
-            if ($view->media) {
-                $metadataEntities = $entityManager->getRepository(ExtractMetadata::class)
-                    ->findBy(['media' => $view->media->id()]);
-            }
-            if (!$element && !$metadataEntities) {
-                // The media must have metadata to render section.
-                return;
-            }
-            echo $view->partial('common/extract-metadata-section', [
-                'element' => $element,
-                'metadataEntities' => $metadataEntities,
-            ]);
-        };
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.edit.form.after',
-            $viewEditFormAfter
+            function (Event $event) {
+                $view = $event->getTarget();
+                if (!$view->item->media()) {
+                    // The item must have media to render section.
+                    return;
+                }
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata'
+                ));
+                $element = $this->getActionSelect();
+                echo $view->partial('common/extract-metadata-section-item-edit', [
+                    'element' => $element,
+                ]);
+            }
         );
+        /*
+         * Add an "Extract metadata" section to the media edit page.
+         */
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
             'view.edit.form.after',
-            $viewEditFormAfter
+            function (Event $event) {
+                $view = $event->getTarget();
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata')
+                );
+                $element = $this->getActionSelect();
+                $metadataEntities = $this->getServiceLocator()
+                    ->get('Omeka\EntityManager')
+                    ->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $view->media->id()]);
+                echo $view->partial('common/extract-metadata-section-media-edit', [
+                    'element' => $element,
+                    'metadataEntities' => $metadataEntities,
+                ]);
+            }
         );
+        /*
+         * Add an "Extract metadata" section to the media show page.
+         */
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
             'view.show.after',
-            $viewEditFormAfter
+            function (Event $event) {
+                $view = $event->getTarget();
+                $view->headLink()->appendStylesheet($view->assetUrl(
+                    'css/admin/extract-metadata.css',
+                    'ExtractMetadata'
+                ));
+                $metadataEntities = $this->getServiceLocator()
+                    ->get('Omeka\EntityManager')
+                    ->getRepository(ExtractMetadata::class)
+                    ->findBy(['media' => $view->media->id()]);
+                if (!$metadataEntities) {
+                    // The media must have metadata to render section.
+                    return;
+                }
+                echo $view->partial('common/extract-metadata-section-media-show', [
+                    'metadataEntities' => $metadataEntities,
+                ]);
+
+            }
         );
     }
 
