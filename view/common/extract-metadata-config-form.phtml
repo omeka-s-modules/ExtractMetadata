@@ -128,6 +128,20 @@ TEMPLATE;
 </div>
 
 <script>
+// The JSON Pointer mapper must be checked to view its configuration.
+const jsonPointerToggle = function(val) {
+    if ('jsonPointer' === val) {
+        $('#json-pointer-label').show();
+    } else {
+        $('#json-pointer-label').hide();
+    }
+};
+jsonPointerToggle($('input[name="enabled_mapper"]:checked').val());
+$('input[name="enabled_mapper"]').on('click', function(e) {
+    jsonPointerToggle($(this).val());
+});
+
+// Handle the JSON Pointer configuration.
 const jsonPointerAdd = $('#json-pointer-add');
 const jsonPointerTable = $('#json-pointer-table');
 const jsonPointerRowTemplate = jsonPointerTable.data('rowTemplate');
