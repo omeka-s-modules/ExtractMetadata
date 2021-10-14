@@ -69,7 +69,7 @@ Created" property:
 - Extractor: "Exif"
 - Pointer: `/EXIF/DateTimeOriginal`
 - Property: "Dublin Core : Date Created"
-- Replace values?: [checked or unchecked]
+- Replace values: [checked or unchecked]
 
 Note that the pointer points to the DateTimeOriginal value in the Exif metadata
 output, which you can view in a JPEG media's "Extract metadata" section. Once you've

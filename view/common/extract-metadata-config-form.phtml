@@ -119,13 +119,29 @@ TEMPLATE;
                 <th><?php echo $this->translate('Extractor'); ?></th>
                 <th><?php echo $this->translate('Pointer'); ?></th>
                 <th><?php echo $this->translate('Property'); ?></th>
-                <th><?php echo $this->translate('Replace values?'); ?></th>
+                <th><?php echo $this->translate('Replace values'); ?></th>
                 <th></th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
 </div>
+
+<style>
+#json-pointer-table {
+    table-layout: auto;
+}
+#json-pointer-table td {
+    border-bottom: 0 solid black;
+}
+.json-pointer-resource, .json-pointer-extractor, .json-pointer-pointer {
+    width: 100%;
+}
+.json-pointer-pointer {
+    font-size: 14px;
+    font-family: monospace;
+}
+</style>
 
 <script>
 // The JSON Pointer mapper must be checked to view its configuration.
@@ -169,7 +185,10 @@ jsonPointerAdd.on('click', function(e) {
     const jsonPointerRow = jsonPointerGetRow();
     jsonPointerTable.show();
     jsonPointerTable.find('tbody').append(jsonPointerRow);
-    jsonPointerRow.find('.chosen-select').chosen();
+    jsonPointerRow.find('.chosen-select').chosen({
+        include_group_label_in_selected: true,
+        width: '100%',
+    });
 });
 jsonPointerTable.on('click', '.json-pointer-delete', function(e) {
     e.preventDefault();
