@@ -6,17 +6,20 @@ the following features:
 - When configuring the module, the user can:
     - View and enable/diable extractors;
     - View and enable/diable mappers;
-    - View the metadata crosswalk for the JSON Pointer mapper (if defined).
+    - Configure the metadata crosswalk for the JSON Pointer mapper (if enabled).
 - When adding a media, the module will automatically:
-    - Extract metadata from the file;
+    - Extract metadata from the file using enabled;
     - Save the metadata alongside the media;
     - Map metadata to resource values.
 - When editing a media/item or batch editing media/item, the user can choose to
   perform a number of actions:
     - Refresh metadata: (re)extract metadata from files;
-    - Refresh and map metadata: (re)extract metadata from files and map metadata to resource values;
+    - Refresh and map metadata: (re)extract metadata from files and map metadata
+      to resource values;
     - Map metadata: Map extracted metadata to resource values;
     - Delete metadata: Delete extracted metadata.
+- When viewing and editing a media, the user can see the extracted metadata in the
+  "Extract metadata" section.
 
 ## Extractors:
 
@@ -37,7 +40,8 @@ PHP's [exif](https://www.php.net/manual/en/book.exif.php) extension.
 ### getID3
 
 Used to extract many types of metadata from many types of files. Uses the
-[getID3](https://github.com/JamesHeinrich/getID3) PHP library.
+[getID3](https://github.com/JamesHeinrich/getID3) PHP library, which comes with
+this module.
 
 ### Tika
 
@@ -48,7 +52,7 @@ under `[extract_metadata_extractor_config][tika][jar_path]`.
 
 ## Mappers
 
-Mappers map extracted metadata to resource values. Note that mappers must be enabled
+Mappers map extracted metadata to resource values. Note that a mapper must be enabled
 on the module configuration page. This module comes with one mapper, but more can
 be added depending on your need.
 
@@ -57,6 +61,21 @@ be added depending on your need.
 Used to map metadata to resource values using [JSON pointers](https://datatracker.ietf.org/doc/html/rfc6901).
 You must define your own metadata crosswalk in the module configuration page under
 "JSON Pointer crosswalk".
+
+One common example is to map a JPEG file's creation date to Dublin Core's "Date
+Created" property:
+
+- Resource: [Media or Item]
+- Extractor: "Exif"
+- Pointer: `/EXIF/DateTimeOriginal`
+- Property: "Dublin Core : Date Created"
+- Replace values?: [checked or unchecked]
+
+Note that the pointer points to the DateTimeOriginal value in the Exif metadata
+output, which you can view in a JPEG media's "Extract metadata" section. Once you've
+saved this map, perform the "Map metadata" action as described above and, if your
+JPEG file includes DateTimeOriginal, the media/item should now have a "Date Created"
+value.
 
 # Copyright
 
