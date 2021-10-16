@@ -48,10 +48,16 @@ SQL;
 
     public function uninstall(ServiceLocatorInterface $services)
     {
+        // Drop extract_metadata table.
         $conn = $services->get('Omeka\Connection');
         $conn->exec('SET FOREIGN_KEY_CHECKS=0;');
         $conn->exec('DROP TABLE IF EXISTS extract_metadata;');
         $conn->exec('SET FOREIGN_KEY_CHECKS=1;');
+        // Delete extract_metadata settings.
+        $settings = $services->get('Omeka\Settings');
+        $settings->delete('extract_metadata_enabled_extractors');
+        $settings->delete('extract_metadata_enabled_mapper');
+        $settings->delete('extract_metadata_json_pointer_crosswalk');
     }
 
     public function getConfigForm(PhpRenderer $view)
