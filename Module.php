@@ -372,7 +372,7 @@ SQL;
     {
         if (!@is_file($filePath)) {
             // The file doesn't exist.
-            return;
+            return [];
         }
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
