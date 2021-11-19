@@ -77,6 +77,18 @@ saved this map, perform the "Map metadata" action as described above and, if you
 JPEG file includes DateTimeOriginal, the media/item should now have a "Date Created"
 value.
 
+## Installing Dependencies
+
+If installing directly from the Git repository, you will need to install dependencies
+using [Composer](https://getcomposer.org/). Within the ExtractMetadata/ directory,
+run the following:
+
+```
+$ composer install
+```
+
+This will install dependencies in a vendor/ directory.
+
 # Copyright
 
 ExtractMetadata is Copyright © 2019-present Corporation for Digital Scholarship,
