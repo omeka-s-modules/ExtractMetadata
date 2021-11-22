@@ -33,7 +33,7 @@ class JsonPointer implements MapperInterface
         $itemEntity = $mediaEntity->getItem();
         $mediaValues = $mediaEntity->getValues();
         $itemValues = $itemEntity->getValues();
-        $propertiesToClear = ['media' => [], 'item' =>[]];
+        $propertiesToClear = ['media' => [], 'item' => []];
         $valuesToAdd = ['media' => [], 'item' => []];
         foreach ($this->crosswalk as $map) {
             if (!isset($map['resource'], $map['extractor'], $map['pointer'], $map['property'], $map['replace'])) {

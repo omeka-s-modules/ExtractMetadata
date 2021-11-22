@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-04 13:40-0400\n"
+"POT-Creation-Date: 2021-11-22 12:36-0500\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
 "Last-Translator: Alfonso Montejo <almontejor@gmail.com>, 2021\n"
 "Language-Team: Spanish (https://www.transifex.com/omeka/teams/14184/es/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: Module.php:215
+#: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
 msgstr "Extraer metadatos"
 
@@ -31,18 +31,20 @@ msgstr "Extractores"
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Mappers"
-msgstr ""
+msgstr "Mapeadores"
 
 #: view/common/extract-metadata-config-form.phtml:6
-msgid "JSON Pointer"
+msgid "JSON Pointer crosswalk"
 msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:10
 msgid "Select which extractors to enable when extracting metadata from files."
 msgstr ""
+"Seleccionar qué extractores estarán habilitados al extraer metadatos de los "
+"archivos."
 
 #: view/common/extract-metadata-config-form.phtml:14
-#: view/common/extract-metadata-config-form.phtml:75
+#: view/common/extract-metadata-config-form.phtml:119
 msgid "Extractor"
 msgstr "Extractor"
 
@@ -51,64 +53,67 @@ msgid "Available"
 msgstr "Disponible"
 
 #: view/common/extract-metadata-config-form.phtml:16
-#: view/common/extract-metadata-config-form.phtml:47
+#: view/common/extract-metadata-config-form.phtml:48
 msgid "Enabled"
-msgstr ""
+msgstr "Activado"
 
-#: view/common/extract-metadata-config-form.phtml:42
+#: view/common/extract-metadata-config-form.phtml:43
 msgid ""
 "Select which mappers to enable when mapping metadata to resource values."
 msgstr ""
+"Seleccionar qué mapeadores estarán habilitados para asignar los metadatos a "
+"los valores de los recursos."
 
-#: view/common/extract-metadata-config-form.phtml:46
+#: view/common/extract-metadata-config-form.phtml:47
 msgid "Mapper"
+msgstr "Mapeador"
+
+#: view/common/extract-metadata-config-form.phtml:53
+msgid "[no mapper]"
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:69
+#: view/common/extract-metadata-config-form.phtml:108
+#, php-format
 msgid ""
-"The metadata crosswalk for the JSON Pointer mapper. Invalid mappings will be"
-" marked as [invalid]."
+"Define the metadata crosswalk for the JSON Pointer mapper. Note that the "
+"\"Pointer\" must be formatted using a JSON pointer as defined by the %sIETF "
+"standard%s."
 msgstr ""
 
-#: view/common/extract-metadata-config-form.phtml:76
+#: view/common/extract-metadata-config-form.phtml:111
+msgid "Add map +"
+msgstr ""
+
+#: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
-msgstr ""
-
-#: view/common/extract-metadata-config-form.phtml:78
-msgid "Replace"
-msgstr ""
-
-#: view/common/extract-metadata-config-form.phtml:84
-msgid "[invalid]"
-msgstr ""
+msgstr "Indicador"
 
 #: view/common/extract-metadata-config-form.phtml:122
-msgid ""
-"No crosswalk is defined. You may define the crosswalk in "
-"<code>config/json_pointer_crosswalk.config.php</code>."
+msgid "Replace values"
 msgstr ""
 
-#: view/common/extract-metadata-section.phtml:8
+#: view/common/extract-metadata-section-media-edit.phtml:7
+#: view/common/extract-metadata-section-media-show.phtml:6
 #, php-format
 msgid "Last extracted %s."
 msgstr "Última extracción %s."
 
-#: Module.php:20
+#: Module.php:21
 msgid "Refresh metadata"
 msgstr "Actualizar metadatos"
 
-#: Module.php:21
-msgid "Refresh and map metadata"
-msgstr ""
-
 #: Module.php:22
-msgid "Map metadata"
-msgstr ""
+msgid "Refresh and map metadata"
+msgstr "Actualizar y mapear metadatos"
 
 #: Module.php:23
-msgid "Delete metadata"
-msgstr ""
+msgid "Map metadata"
+msgstr "Mapear metadatos"
 
-#: Module.php:437
+#: Module.php:24
+msgid "Delete metadata"
+msgstr "Borrar metadatos"
+
+#: Module.php:530
 msgid "[No action]"
 msgstr "[Ninguna acción]"

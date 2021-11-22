@@ -2,20 +2,24 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
+# Translators:
+# Kai Metsävainio <kai.metsavainio@gmail.com>, 2021
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-22 12:36-0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2021-09-20 18:27+0000\n"
+"Last-Translator: Kai Metsävainio <kai.metsavainio@gmail.com>, 2021\n"
+"Language-Team: Finnish (Finland) (https://www.transifex.com/omeka/teams/14184/fi_FI/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fi_FI\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
@@ -44,12 +48,12 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:15
 msgid "Available"
-msgstr ""
+msgstr "Saatavissa"
 
 #: view/common/extract-metadata-config-form.phtml:16
 #: view/common/extract-metadata-config-form.phtml:48
 msgid "Enabled"
-msgstr ""
+msgstr "Käytössä"
 
 #: view/common/extract-metadata-config-form.phtml:43
 msgid ""
@@ -92,7 +96,7 @@ msgstr ""
 
 #: Module.php:21
 msgid "Refresh metadata"
-msgstr ""
+msgstr "Päivitä metatiedot"
 
 #: Module.php:22
 msgid "Refresh and map metadata"
@@ -104,8 +108,8 @@ msgstr ""
 
 #: Module.php:24
 msgid "Delete metadata"
-msgstr ""
+msgstr "Poista metatiedot"
 
 #: Module.php:530
 msgid "[No action]"
-msgstr ""
+msgstr "[Ei toimintoa]"

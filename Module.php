@@ -355,7 +355,6 @@ SQL;
                 echo $view->partial('common/extract-metadata-section-media-show', [
                     'metadataEntities' => $metadataEntities,
                 ]);
-
             }
         );
     }
@@ -434,7 +433,7 @@ SQL;
      */
     public function mapMetadata(Entity\Media $mediaEntity, array $metadataEntities)
     {
-        $services =$this->getServiceLocator();
+        $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $mappers = $services->get('ExtractMetadata\MapperManager');
         $enabledMapper = $settings->get('extract_metadata_enabled_mapper', null);
