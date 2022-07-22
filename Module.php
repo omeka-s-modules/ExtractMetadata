@@ -357,6 +357,21 @@ SQL;
                 ]);
             }
         );
+        /*
+         * IIIF Presentation module
+         *
+         * Provide accurate metadata to content resources.
+         */
+        $sharedEventManager->attach(
+            '*',
+            'iiif_presentation.2.media.canvas',
+            [$this, 'iiifPresentation2ContentResource']
+        );
+        $sharedEventManager->attach(
+            '*',
+            'iiif_presentation.3.media.canvas',
+            [$this, 'iiifPresentation3ContentResource']
+        );
     }
 
     /**
@@ -543,5 +558,179 @@ SQL;
             ->get('Omeka\EntityManager')
             ->getRepository(ExtractMetadata::class)
             ->findBy(['media' => $mediaEntity]);
+    }
+
+    /**
+     * Get a metadata entity for a media/extractor.
+     *
+     * @param int $mediaId
+     * @param string $extractor
+     * @return ExtractMetadata
+     */
+    public function getMetadataEntity($mediaId, $extractor)
+    {
+        return $this->getServiceLocator()
+            ->get('Omeka\EntityManager')
+            ->getRepository(ExtractMetadata::class)
+            ->findOneBy([
+                'media' => $mediaId,
+                'extractor' => $extractor,
+            ]);
+    }
+
+    /**
+     * IIIF Presentation module:
+     *
+     * Provide accurate metadata to IIIF v2 content resources.
+     *
+     * @param Event $event
+     */
+    public function iiifPresentation2ContentResource(Event $event)
+    {
+        $canvas = $event->getParam('canvas');
+        $mediaId = $event->getParam('media_id');
+        if (!isset($canvas['images'][0]['resource']['@type'])) {
+            // Unexpected IIIF canvas format. Cannot find resource content.
+            return;
+        }
+        $width = $height = null;
+        switch ($canvas['images'][0]['resource']['@type']) {
+            case 'dctypes:Image':
+                [$width, $height] = $this->iiifPresentationImage($mediaId);
+                break;
+            default;
+                return;
+        }
+        if ($width) {
+            $canvas['images'][0]['resource']['width'] = $width;
+        }
+        if ($height) {
+            $canvas['images'][0]['resource']['height'] = $height;
+        }
+        $event->setParam('canvas', $canvas);
+    }
+
+    /**
+     * IIIF Presentation module:
+     *
+     * Provide accurate metadata to IIIF v3 content resources.
+     *
+     * @param Event $event
+     */
+    public function iiifPresentation3ContentResource(Event $event)
+    {
+        $canvas = $event->getParam('canvas');
+        $mediaId = $event->getParam('media_id');
+        if (!isset($canvas['items'][0]['items'][0]['body']['type'])) {
+            // Unexpected IIIF canvas format. Cannot find resource content.
+            return;
+        }
+        $width = $height = $duration = null;
+        switch ($canvas['items'][0]['items'][0]['body']['type']) {
+            case 'Image':
+                [$width, $height] = $this->iiifPresentationImage($mediaId);
+                break;
+            case 'Video':
+                [$width, $height, $duration] = $this->iiifPresentationVideo($mediaId);
+                break;
+            case 'Sound':
+                $duration = $this->iiifPresentationSound($mediaId);
+                break;
+            default;
+                return;
+        }
+        if ($width) {
+            $canvas['items'][0]['items'][0]['body']['width'] = $width;
+        }
+        if ($height) {
+            $canvas['items'][0]['items'][0]['body']['height'] = $height;
+        }
+        if ($duration) {
+            $canvas['items'][0]['items'][0]['body']['duration'] = $duration;
+        }
+        $event->setParam('canvas', $canvas);
+    }
+
+    /**
+     * IIIF Presentation module:
+     *
+     * Get the width and height of an image media.
+     *
+     * @param int $mediaId
+     * @return array [0] = width, [1] = height
+     */
+    protected function iiifPresentationImage($mediaId)
+    {
+        $metadataEntity = $this->getMetadataEntity($mediaId, 'exiftool');
+        if (!$metadataEntity) {
+            // This media has no extracted metadata.
+            return;
+        }
+        $metadata = $metadataEntity->getMetadata();
+        $width = $height = null;
+
+        $dimensions = @$metadata['Composite']['ImageSize'];
+        if ($dimensions) {
+            [$width, $height] = explode('x', $dimensions);
+        }
+
+        return [$width, $height];
+    }
+
+    /**
+     * IIIF Presentation module:
+     *
+     * Get the width, height, and duration of a video media.
+     *
+     * @param int $mediaId
+     * @return array [0] = width, [1] = height, [2] = duration
+     */
+    protected function iiifPresentationVideo($mediaId)
+    {
+        $metadataEntity = $this->getMetadataEntity($mediaId, 'exiftool');
+        if (!$metadataEntity) {
+            // This media has no extracted metadata.
+            return;
+        }
+        $metadata = $metadataEntity->getMetadata();
+        $width = $height = $duration = null;
+
+        $dimensions = @$metadata['Composite']['ImageSize'];
+        if ($dimensions) {
+            [$width, $height] = explode('x', $dimensions);
+        }
+        $duration = @$metadata['Composite']['Duration'];
+        if ($duration) {
+            preg_match('/[\d]{1,2}:[\d]{2}:[\d]{2}/', $duration, $matches);
+            $duration = strtotime($matches[0]) - strtotime('00:00:00');
+        }
+
+        return [$width, $height, $duration];
+    }
+
+    /**
+     * IIIF Presentation module:
+     *
+     * Get the duration of an audio media.
+     *
+     * @param int $mediaId
+     * @return float
+     */
+    protected function iiifPresentationSound($mediaId)
+    {
+        $metadataEntity = $this->getMetadataEntity($mediaId, 'exiftool');
+        if (!$metadataEntity) {
+            // This media has no extracted metadata.
+            return;
+        }
+        $metadata = $metadataEntity->getMetadata();
+
+        $duration = @$metadata['Composite']['Duration'];
+        if ($duration) {
+            preg_match('/[\d]{1,2}:[\d]{2}:[\d]{2}/', $duration, $matches);
+            $duration = strtotime($matches[0]) - strtotime('00:00:00');
+        }
+
+        return $duration;
     }
 }
