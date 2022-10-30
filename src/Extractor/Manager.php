@@ -11,6 +11,6 @@ class Manager extends AbstractPluginManager
 
     public function get($name, $options = [], $usePeeringServiceManagers = true)
     {
-        return parent::get($name, $options, $usePeeringServiceManagers);
+        return parent::get($name ?? '', $options, $usePeeringServiceManagers);
     }
 }
