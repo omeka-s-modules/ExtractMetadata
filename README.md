@@ -77,6 +77,14 @@ saved this map, perform the "Map metadata" action as described above and, if you
 JPEG file includes DateTimeOriginal, the media/item should now have a "Date Created"
 value.
 
+## IIIF Presentation module
+
+This module can automatically provide accurate width, height, and duration metadata
+for IIIF content resources published by the [IIIF Presentation module](https://github.com/omeka-s-modules/IiifPresentation).
+This is useful for IIIF viewers that require strict validation against the IIIF
+specification. Note that the metadata is only available if the metadata has already
+been extracted by the ExifTool extractor.
+
 ## Installing Dependencies
 
 If installing directly from the Git repository, you will need to install dependencies
