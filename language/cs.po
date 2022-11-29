@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# abc Def <hdogan1974@gmail.com>, 2021
+# Martin Slavík <martin.d.slavik@gmail.com>, 2022
 # 
 #, fuzzy
 msgid ""
@@ -13,25 +13,25 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-29 12:16-0500\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
-"Last-Translator: abc Def <hdogan1974@gmail.com>, 2021\n"
-"Language-Team: Turkish (Turkey) (https://www.transifex.com/omeka/teams/14184/tr_TR/)\n"
+"Last-Translator: Martin Slavík <martin.d.slavik@gmail.com>, 2022\n"
+"Language-Team: Czech (https://www.transifex.com/omeka/teams/14184/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: tr_TR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
-msgstr "Meta verisini çıkart"
+msgstr "Načíst metadata"
 
 #: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractors"
-msgstr "Çıkarıcılar"
+msgstr "Extraktory"
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Mappers"
-msgstr "Haritacılar"
+msgstr "Mapovače"
 
 #: view/common/extract-metadata-config-form.phtml:6
 msgid "JSON Pointer crosswalk"
@@ -39,34 +39,35 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:10
 msgid "Select which extractors to enable when extracting metadata from files."
-msgstr ""
+msgstr "Vyberte, které mapovače povolíte při načtení metadat ze souborů."
 
 #: view/common/extract-metadata-config-form.phtml:14
 #: view/common/extract-metadata-config-form.phtml:119
 msgid "Extractor"
-msgstr "Çıkarıcı"
+msgstr "Extraktor"
 
 #: view/common/extract-metadata-config-form.phtml:15
 msgid "Available"
-msgstr "Kullanılabilir"
+msgstr "Dostupné"
 
 #: view/common/extract-metadata-config-form.phtml:16
 #: view/common/extract-metadata-config-form.phtml:48
 msgid "Enabled"
-msgstr "Etkinleştir"
+msgstr "Povolené"
 
 #: view/common/extract-metadata-config-form.phtml:43
 msgid ""
 "Select which mappers to enable when mapping metadata to resource values."
 msgstr ""
+"Vyberte, které mapovače povolíte při mapování metadat na hodnoty zdrojů."
 
 #: view/common/extract-metadata-config-form.phtml:47
 msgid "Mapper"
-msgstr "Haritacı"
+msgstr "Mapovač"
 
 #: view/common/extract-metadata-config-form.phtml:53
 msgid "[no mapper]"
-msgstr ""
+msgstr "[žádný mapovač]"
 
 #: view/common/extract-metadata-config-form.phtml:108
 #, php-format
@@ -78,38 +79,38 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:111
 msgid "Add map +"
-msgstr ""
+msgstr "Přidat mapu +"
 
 #: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
-msgstr "İşaretçi"
+msgstr "Ukazatel"
 
 #: view/common/extract-metadata-config-form.phtml:122
 msgid "Replace values"
-msgstr ""
+msgstr "Nahradit hodnoty"
 
 #: view/common/extract-metadata-section-media-edit.phtml:7
 #: view/common/extract-metadata-section-media-show.phtml:6
 #, php-format
 msgid "Last extracted %s."
-msgstr ""
+msgstr "Poslední načtený %s."
 
 #: Module.php:21
 msgid "Refresh metadata"
-msgstr ""
+msgstr "Obnovit metadata"
 
 #: Module.php:22
 msgid "Refresh and map metadata"
-msgstr ""
+msgstr "Obnovit a namapovat metadata"
 
 #: Module.php:23
 msgid "Map metadata"
-msgstr ""
+msgstr "Mapovat metadata"
 
 #: Module.php:24
 msgid "Delete metadata"
-msgstr ""
+msgstr "Smazat metadata"
 
 #: Module.php:544
 msgid "[No action]"
-msgstr "[Eylem yok]"
+msgstr "[žádná akce]"

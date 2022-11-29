@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-22 12:36-0500\n"
+"POT-Creation-Date: 2022-11-29 12:16-0500\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
 "Last-Translator: Alfonso Montejo <almontejor@gmail.com>, 2021\n"
 "Language-Team: Spanish (https://www.transifex.com/omeka/teams/14184/es/)\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
@@ -35,7 +35,7 @@ msgstr "Mapeadores"
 
 #: view/common/extract-metadata-config-form.phtml:6
 msgid "JSON Pointer crosswalk"
-msgstr ""
+msgstr "Traspaso de metadatos del indicador JSON"
 
 #: view/common/extract-metadata-config-form.phtml:10
 msgid "Select which extractors to enable when extracting metadata from files."
@@ -70,7 +70,7 @@ msgstr "Mapeador"
 
 #: view/common/extract-metadata-config-form.phtml:53
 msgid "[no mapper]"
-msgstr ""
+msgstr "[ningún mapeador]"
 
 #: view/common/extract-metadata-config-form.phtml:108
 #, php-format
@@ -79,10 +79,13 @@ msgid ""
 "\"Pointer\" must be formatted using a JSON pointer as defined by the %sIETF "
 "standard%s."
 msgstr ""
+"Definir el traspaso de metadatos para el mapeador del indicador JSON. El "
+"\"Indicador\" debe formatearse con un indicador JSON según lo definido por  "
+"%s estándar IETF %s."
 
 #: view/common/extract-metadata-config-form.phtml:111
 msgid "Add map +"
-msgstr ""
+msgstr "Añadir mapa +"
 
 #: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
@@ -90,7 +93,7 @@ msgstr "Indicador"
 
 #: view/common/extract-metadata-config-form.phtml:122
 msgid "Replace values"
-msgstr ""
+msgstr "Reemplazar valores"
 
 #: view/common/extract-metadata-section-media-edit.phtml:7
 #: view/common/extract-metadata-section-media-show.phtml:6
@@ -114,6 +117,6 @@ msgstr "Mapear metadatos"
 msgid "Delete metadata"
 msgstr "Borrar metadatos"
 
-#: Module.php:530
+#: Module.php:544
 msgid "[No action]"
 msgstr "[Ninguna acción]"

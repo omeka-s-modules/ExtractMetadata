@@ -5,33 +5,34 @@
 # 
 # Translators:
 # Simone Falteri <s.falteri@ifnet.it>, 2021
+# Giorgio Comai <g@giorgiocomai.eu>, 2022
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-22 12:36-0500\n"
+"POT-Creation-Date: 2022-11-29 12:16-0500\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
-"Last-Translator: Simone Falteri <s.falteri@ifnet.it>, 2021\n"
+"Last-Translator: Giorgio Comai <g@giorgiocomai.eu>, 2022\n"
 "Language-Team: Italian (https://www.transifex.com/omeka/teams/14184/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
-msgstr "Estrai metadati"
+msgstr "Estrai metadata"
 
 #: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractors"
-msgstr ""
+msgstr "Estrattori"
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Mappers"
-msgstr ""
+msgstr "Mappatori"
 
 #: view/common/extract-metadata-config-form.phtml:6
 msgid "JSON Pointer crosswalk"
@@ -40,6 +41,7 @@ msgstr ""
 #: view/common/extract-metadata-config-form.phtml:10
 msgid "Select which extractors to enable when extracting metadata from files."
 msgstr ""
+"Seleziona quali estrattori attivare quando si estraggono metadata dai file"
 
 #: view/common/extract-metadata-config-form.phtml:14
 #: view/common/extract-metadata-config-form.phtml:119
@@ -53,20 +55,22 @@ msgstr "Disponibile"
 #: view/common/extract-metadata-config-form.phtml:16
 #: view/common/extract-metadata-config-form.phtml:48
 msgid "Enabled"
-msgstr ""
+msgstr "Abilitato"
 
 #: view/common/extract-metadata-config-form.phtml:43
 msgid ""
 "Select which mappers to enable when mapping metadata to resource values."
 msgstr ""
+"Seleziona quali mappatori abilitare quando si mappano metadata ai valori di "
+"risorsa."
 
 #: view/common/extract-metadata-config-form.phtml:47
 msgid "Mapper"
-msgstr ""
+msgstr "Mappatore"
 
 #: view/common/extract-metadata-config-form.phtml:53
 msgid "[no mapper]"
-msgstr ""
+msgstr "[nessun mappatore]"
 
 #: view/common/extract-metadata-config-form.phtml:108
 #, php-format
@@ -78,7 +82,7 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:111
 msgid "Add map +"
-msgstr ""
+msgstr "Aggiungi mappatura +"
 
 #: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
@@ -86,13 +90,13 @@ msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:122
 msgid "Replace values"
-msgstr ""
+msgstr "Sostituisci valori"
 
 #: view/common/extract-metadata-section-media-edit.phtml:7
 #: view/common/extract-metadata-section-media-show.phtml:6
 #, php-format
 msgid "Last extracted %s."
-msgstr ""
+msgstr "Ultimi estratti %s."
 
 #: Module.php:21
 msgid "Refresh metadata"
@@ -100,16 +104,16 @@ msgstr "Aggiorna metadati"
 
 #: Module.php:22
 msgid "Refresh and map metadata"
-msgstr ""
+msgstr "Aggiorna e mappa i metadata"
 
 #: Module.php:23
 msgid "Map metadata"
-msgstr ""
+msgstr "Mappa i metadata"
 
 #: Module.php:24
 msgid "Delete metadata"
-msgstr ""
+msgstr "Elimina metadata"
 
-#: Module.php:530
+#: Module.php:544
 msgid "[No action]"
 msgstr "[nessuna azione]"
