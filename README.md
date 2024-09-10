@@ -85,18 +85,6 @@ This is useful for IIIF viewers that require strict validation against the IIIF
 specification. Note that the metadata is only available if the metadata has already
 been extracted by the ExifTool extractor.
 
-## Installing Dependencies
-
-If installing directly from the Git repository, you will need to install dependencies
-using [Composer](https://getcomposer.org/). Within the ExtractMetadata/ directory,
-run the following:
-
-```
-$ composer install
-```
-
-This will install dependencies in a vendor/ directory.
-
 # Copyright
 
 ExtractMetadata is Copyright © 2019-present Corporation for Digital Scholarship,
