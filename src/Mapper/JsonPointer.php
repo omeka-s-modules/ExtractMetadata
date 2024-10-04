@@ -40,10 +40,20 @@ class JsonPointer implements MapperInterface
                 // All keys are required.
                 continue;
             }
-            if (!in_array($map['resource'], ['media', 'item'])) {
-                // This resource is invalid.
-                continue;
+
+            $resourceType = $map['resource'];
+            switch ($resourceType) {
+                case 'media':
+                    $entity = $mediaEntity;
+                    break;
+                case 'item':
+                    $entity = $itemEntity;
+                    break;
+                default:
+                    // This resource is invalid.
+                    continue 2;
             }
+
             $metadataEntity = current(array_filter($metadataEntities, function ($metadataEntity) use ($map) {
                 return $map['extractor'] === $metadataEntity->getExtractor();
             }));
@@ -58,32 +68,30 @@ class JsonPointer implements MapperInterface
             }
             try {
                 $jsonPointer = new Pointer(json_encode($metadataEntity->getMetadata()));
-                $valueString = $jsonPointer->get($map['pointer']);
+                $pointerValue = $jsonPointer->get($map['pointer']);
             } catch (\Exception $e) {
                 // Invalid JSON, invalid pointer, or nonexistent value.
                 continue;
             }
-            if (!is_string($valueString)) {
-                // The pointer did not resolve to a string.
-                continue;
+
+            if (!is_array($pointerValue)) {
+                $pointerValue = [$pointerValue];
             }
-            $value = new Entity\Value;
-            $value->setType('literal');
-            $value->setProperty($property);
-            $value->setValue($valueString);
-            $value->setIsPublic(true);
-            if ('media' === $map['resource']) {
-                $value->setResource($mediaEntity);
-                $valuesToAdd['media'][] = $value;
-                if ($map['replace']) {
-                    $propertiesToClear['media'][] = $property;
+            foreach ($pointerValue as $valueString) {
+                if (!is_string($valueString)) {
+                    // The pointer did not resolve to a string.
+                    continue;
                 }
-            }
-            if ('item' === $map['resource']) {
-                $value->setResource($itemEntity);
-                $valuesToAdd['item'][] = $value;
+                $value = new Entity\Value;
+                $value->setType('literal');
+                $value->setProperty($property);
+                $value->setValue($valueString);
+                $value->setIsPublic(true);
+                $value->setResource($entity);
+
+                $valuesToAdd[$resourceType][] = $value;
                 if ($map['replace']) {
-                    $propertiesToClear['item'][] = $property;
+                    $propertiesToClear[$resourceType][$property] = $property;
                 }
             }
         }
