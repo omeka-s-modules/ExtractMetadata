@@ -2,7 +2,7 @@
 
 An Omeka S module for that allows site administrators to extract embedded metadata from media files. 
 
-    Manual: https://omeka.org/s/docs/user-manual/modules/extractmetadata/
+    Manual: [https://omeka.org/s/docs/user-manual/modules/extractmetadata/](https://omeka.org/s/docs/user-manual/modules/extractmetadata/)
 
 Copyright
 
