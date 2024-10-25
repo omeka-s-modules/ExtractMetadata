@@ -1,6 +1,10 @@
 # Extract Metadata
 
-An Omeka S module for that allows site administrators to extract embedded metadata from media files. 
+An Omeka S module for that allows site administrators to extract embedded metadata from media files, such as photograph metadata embedded when a digital camera takes a picture. 
+
+The module can manually extract embedded metadata found on individual files, and adds batch-editing features. When enabled, it automatically works on newly uploaded files, and can work on bulk imports. The extracted metadata can be copied onto Omeka S item and media properties with mapping configuration.
+
+Extractors include EXIF metadata (commonly found on JPEG and TIFF files), Tika (commonly found on PDFs, PPTs, etc.), ID3 (commonly found on MP3s), etc. For more information, see the manual.
 
 - Manual: https://omeka.org/s/docs/user-manual/modules/extractmetadata/
 - Developer docs: https://omeka.org/s/docs/developer/module_docs/ExtractMetadata/
