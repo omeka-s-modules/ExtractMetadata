@@ -5,17 +5,17 @@
 # 
 # Translators:
 # Simone Falteri <s.falteri@ifnet.it>, 2021
-# Giorgio Comai <g@giorgiocomai.eu>, 2022
+# Giorgio Comai <g@giorgiocomai.eu>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 12:37-0500\n"
+"POT-Creation-Date: 2024-10-25 14:43-0400\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
-"Last-Translator: Giorgio Comai <g@giorgiocomai.eu>, 2022\n"
-"Language-Team: Italian (https://www.transifex.com/omeka/teams/14184/it/)\n"
+"Last-Translator: Giorgio Comai <g@giorgiocomai.eu>, 2024\n"
+"Language-Team: Italian (https://app.transifex.com/omeka/teams/14184/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -86,7 +86,7 @@ msgstr "Aggiungi mappatura +"
 
 #: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
-msgstr ""
+msgstr "Puntatore"
 
 #: view/common/extract-metadata-config-form.phtml:122
 msgid "Replace values"

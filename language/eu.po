@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2024
+# Iametza Interaktiboa, 2022
 # 
 #, fuzzy
 msgid ""
@@ -13,60 +13,61 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-25 14:43-0400\n"
 "PO-Revision-Date: 2021-09-20 18:27+0000\n"
-"Last-Translator: Rubén Alcaraz Martínez <rubenalcarazmartinez@gmail.com>, 2024\n"
-"Language-Team: Catalan (Spain) (https://app.transifex.com/omeka/teams/14184/ca_ES/)\n"
+"Last-Translator: Iametza Interaktiboa, 2022\n"
+"Language-Team: Basque (https://app.transifex.com/omeka/teams/14184/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ca_ES\n"
+"Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Module.php:244 Module.php:261 Module.php:286
 msgid "Extract metadata"
-msgstr "Extreu metadades"
+msgstr "Erauzi metadatua"
 
 #: view/common/extract-metadata-config-form.phtml:4
 msgid "Extractors"
-msgstr "Extractors"
+msgstr "Erauzgailuak"
 
 #: view/common/extract-metadata-config-form.phtml:5
 msgid "Mappers"
-msgstr ""
+msgstr "Mapatzaileak"
 
 #: view/common/extract-metadata-config-form.phtml:6
 msgid "JSON Pointer crosswalk"
-msgstr "JSON Pointer crosswalk"
+msgstr ""
 
 #: view/common/extract-metadata-config-form.phtml:10
 msgid "Select which extractors to enable when extracting metadata from files."
-msgstr ""
+msgstr "Hautatu ze erauzle gaitu metadatua fitxategietatik erauztean."
 
 #: view/common/extract-metadata-config-form.phtml:14
 #: view/common/extract-metadata-config-form.phtml:119
 msgid "Extractor"
-msgstr "Extractor"
+msgstr "Erauzlea"
 
 #: view/common/extract-metadata-config-form.phtml:15
 msgid "Available"
-msgstr "Disponible"
+msgstr "Eskuragarri"
 
 #: view/common/extract-metadata-config-form.phtml:16
 #: view/common/extract-metadata-config-form.phtml:48
 msgid "Enabled"
-msgstr "Activat"
+msgstr "Gaituta"
 
 #: view/common/extract-metadata-config-form.phtml:43
 msgid ""
 "Select which mappers to enable when mapping metadata to resource values."
 msgstr ""
+"Hautatu ze mapatzaile gaitu metadatua baliabide balioetara mapeatzean."
 
 #: view/common/extract-metadata-config-form.phtml:47
 msgid "Mapper"
-msgstr ""
+msgstr "Mapeatzailea"
 
 #: view/common/extract-metadata-config-form.phtml:53
 msgid "[no mapper]"
-msgstr ""
+msgstr "[mapeatzailerik ez]"
 
 #: view/common/extract-metadata-config-form.phtml:108
 #, php-format
@@ -75,44 +76,41 @@ msgid ""
 "\"Pointer\" must be formatted using a JSON pointer as defined by the %sIETF "
 "standard%s."
 msgstr ""
-"Definiu la passarel·la de metadades per al mapejador de punters JSON. "
-"Tingueu en compte que el \"Pointer\" s'ha de formatar utilitzant un punter "
-"JSON tal com el defineix a l'%sIETF standard%s."
 
 #: view/common/extract-metadata-config-form.phtml:111
 msgid "Add map +"
-msgstr ""
+msgstr "Gehitu mapa +"
 
 #: view/common/extract-metadata-config-form.phtml:120
 msgid "Pointer"
-msgstr ""
+msgstr "Erakuslea"
 
 #: view/common/extract-metadata-config-form.phtml:122
 msgid "Replace values"
-msgstr "Substitueix els valors"
+msgstr "Ordezkatu balioak"
 
 #: view/common/extract-metadata-section-media-edit.phtml:7
 #: view/common/extract-metadata-section-media-show.phtml:6
 #, php-format
 msgid "Last extracted %s."
-msgstr "Darrera extracció %s."
+msgstr "Azkeneko erauzketa %s."
 
 #: Module.php:21
 msgid "Refresh metadata"
-msgstr "Actualitza les metadades"
+msgstr "Freskatu metadatua"
 
 #: Module.php:22
 msgid "Refresh and map metadata"
-msgstr "Actualitza i mapeja les metadades"
+msgstr "Freskatu eta mapeatu metadatua"
 
 #: Module.php:23
 msgid "Map metadata"
-msgstr "Mapeja les metadades"
+msgstr "Mapeatu metadatua"
 
 #: Module.php:24
 msgid "Delete metadata"
-msgstr "Suprimeix les metadades"
+msgstr "Ezabatu metadatua"
 
 #: Module.php:544
 msgid "[No action]"
-msgstr "[Cap acció]"
+msgstr "[Ekintzarik ez]"
