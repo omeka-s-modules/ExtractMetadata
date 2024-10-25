@@ -2,6 +2,7 @@
 namespace ExtractMetadata\Mapper;
 
 use Doctrine\Common\Collections\Criteria;
+use Omeka\Api\Adapter\ResourceTitleHydrator;
 use Omeka\Entity;
 use Rs\Json\Pointer;
 
@@ -114,6 +115,17 @@ class JsonPointer implements MapperInterface
         }
         foreach ($valuesToAdd['item'] as $value) {
             $itemValues->add($value);
+        }
+
+        // Update resource titles
+        $titlePropertyDql = "SELECT p FROM Omeka\Entity\Property p JOIN p.vocabulary v WHERE p.localName = 'title' AND v.prefix = 'dcterms'";
+        $titleProperty = $this->entityManager->createQuery($titlePropertyDql)->getOneOrNullResult();
+        $titleHydrator = new ResourceTitleHydrator;
+        if ($valuesToAdd['media']) {
+            $titleHydrator->hydrate($mediaEntity, $titleProperty);
+        }
+        if ($valuesToAdd['item']) {
+            $titleHydrator->hydrate($itemEntity, $titleProperty);
         }
     }
 }
